@@ -303,7 +303,7 @@ fig1da <- ggplot(data=pred1) +
   geom_line(aes(x=grid, y=lower), color="darkblue", linetype="dashed") +
   geom_line(aes(x=grid, y=upper), color="darkblue", linetype="dashed") +
   #geom_point(aes(x=observedpoints, y=mu[observedpoints]), color="black") + #points where we have done observations
-  xlab("L") +
+  xlab("x") +
   ylab("r|d") + 
   labs(title="Conditional expectation with a 90% prediction interval. \nObservation error is present ") + 
   theme_minimal()
@@ -314,7 +314,7 @@ fig1db <- ggplot(data=pred2) +
   geom_line(aes(x=grid, y=lower), color="darkblue", linetype="dashed") +
   geom_line(aes(x=grid, y=upper), color="darkblue", linetype="dashed") +
   #geom_point(aes(x=observedpoints, y=mu[observedpoints]), color="black") + #points where we have done observations
-  xlab("L") +
+  xlab("x") +
   ylab("r|d") + 
   labs(title="Conditional expectation with a 90% prediction interval. \nNo error in the observations") +
   theme_minimal()
