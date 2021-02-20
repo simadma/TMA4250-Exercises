@@ -24,7 +24,6 @@ nu_r_pexp <- c(1,1.9)
 nu_r_mat <- c(1,3)
 
 
-
 #a)
 #finding the covariances for all eight model pairs
 cov1 <-cov.spatial(taus, cov.model="powered.exponential",cov.pars = c(sigma2_r[1], phi), kappa=nu_r_pexp[1])
