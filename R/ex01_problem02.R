@@ -1,4 +1,3 @@
-rm(list = ls())
 library(geoR)     # Analysis of Geostatistical Data
 library(akima)    # Interpolation of Irregularly and Regularly Spaced Data
 library(fields)   # Tools for Spatial Data
@@ -11,31 +10,42 @@ data_path <- "./Data/"
 fig_path <- "./Figures/"
 data <- read.table(file = paste0(data_path, "topo.dat"), header = TRUE)
 
-n <- 315
-spl <- with(data,
-            interp(x, y, z,
-                   xo     = seq(0, n, by = 5),
-                   yo     = seq(0, n, by = 5),
-                   linear = FALSE,
-                   extrap = TRUE
-            )
-)
+lin <- with(data, interp(x, y, z, nx = 70, ny = 70))
+
+# Set-up for color in `persp()` plot
+nbcol <- 256
+zfacet <- with(lin, z[-1, -1] + z[-1, -ncol(z)] + z[-nrow(z), -1] + z[-nrow(z), -ncol(z)])
+facetcol <- cut(zfacet, nbcol)
+
 
 # Plot
 # pdf(
 #   file = paste0(fig_path, "interp_obs.pdf"),
-#   width = 6,
-#   height = 5.75
+#   height = 4,
+#   width = 7
 # )
-image.plot(spl, col = terrain.colors(n = 256), asp = 1)
-contour(spl, nlevels = 11, add = TRUE)
+
+# Plot
+mar_default <- c(5, 4, 4, 2) + 0.1
+# par(mfrow = c(1, 2))
+
+image.plot(lin, col = terrain.colors(nbcol), asp = 1)
+contour(lin, nlevels = 11, add = TRUE)
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
+persp(lin, scale = FALSE,
+  theta = 135, phi = 30,
+  col = terrain.colors(nbcol)[facetcol],
+  lwd = 0.1, border = rgb(0, 0, 0, alpha = 0.8),
+  xlab = "X", zlab = "Elevation",
+  xaxs = "i", yaxs = "i"
+)
+
 
 # dev.off()
 
 ## c)
-m = 100
+m = 70
 gridline <- seq(1, n, length.out = m)
 locs <- expand.grid(x = gridline, y = gridline)
 geodata <- as.geodata(data)
@@ -53,21 +63,58 @@ ord_kc <- krige.conv(
 )
 
 ok <- list(
-  x   = gridline,
-  y   = gridline,
-  z   = matrix(ord_kc$predict, nrow = m),
-  var = matrix(ord_kc$krige.var, nrow = m)
+  x    = gridline,
+  y    = gridline,
+  z    = matrix(ord_kc$predict, nrow = m),
+  var  = matrix(ord_kc$krige.var, nrow = m),
+  beta = matrix(ord_kc$beta.est, nrow = m, ncol = m)
 )
-image.plot(ok, col = terrain.colors(n = 256), asp = 1)
+
+# Set-up for color in `persp()` plot
+zfacet <- with(ok, z[-1, -1] + z[-1, -ncol(z)] + z[-nrow(z), -1] + z[-nrow(z), -ncol(z)])
+facetcol <- cut(zfacet, nbcol)
+
+## Plot
+# pdf(
+#   file = paste0(fig_path, "ord_krig.pdf"),
+#   height = 1.4 * 4,
+#   width = 7
+# )
+
+# par(mfrow = c(2, 2), mar = mar_default - c(3, 0, 3, 0))
+
+# Kriging prediction
+image.plot(ok, col = terrain.colors(nbcol), asp = 1)
 contour(ok, nlevels = 11, add = TRUE)
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
 
-with(ok, image.plot(x, y, var, col = inferno(n = 256), asp = 1))
-with(ok, contour(x, y, var, nlevels = 10, add = TRUE))
+persp(ok,
+  theta = 135, phi = 30,
+  col = terrain.colors(nbcol)[facetcol],
+  lwd = 0.1, border = rgb(0, 0, 0, alpha = 0.8),
+  scale = FALSE,
+  xlab = "X", zlab = "Elevation",
+  xaxs = "i", yaxs = "i"
+)
+
+# Prediction standard deviation
+with(ok, image.plot(x, y, sqrt(var), col = inferno(nbcol), asp = 1, ylab = ""))
+with(ok, contour(x, y, sqrt(var), nlevels = 5, add = TRUE))
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
 
+with(ok, persp(x, y, sqrt(var),
+           theta = 135, phi = 30,
+           col = inferno(nbcol)[facetcol],
+           lwd = 0.1, border = rgb(0, 0, 0, alpha = 0.8),
+           scale = FALSE,
+           xlab = "X", zlab = "Elevation",
+           xaxs = "i", yaxs = "i"
+         )
+)
+
+# dev.off()
 
 ## d)
 uni_kc <- krige.conv(
@@ -87,20 +134,76 @@ uk <- list(
   x   = gridline,
   y   = gridline,
   z   = matrix(uni_kc$predict, nrow = m),
-  var = matrix(uni_kc$krige.var, nrow = m)
+  var = matrix(uni_kc$krige.var, nrow = m),
+  zprior = outer(
+    X   = gridline,
+    Y   = gridline,
+    FUN = function(X, Y) {
+      uni_kc$beta.est[1] + X * uni_kc$beta.est[2] + Y * uni_kc$beta.est[3] +
+        X * Y * uni_kc$beta.est[4] + X^2 * uni_kc$beta.est[5] + Y^2 * uni_kc$beta.est[6]
+    }
+  )
 )
 
-image.plot(uk, col = terrain.colors(n = 256), asp = 1)
+# Set-up for color in `persp()` plot
+zfacet <- with(uk, z[-1, -1] + z[-1, -ncol(z)] + z[-nrow(z), -1] + z[-nrow(z), -ncol(z)])
+facetcol <- cut(zfacet, nbcol)
+
+## Plot
+# pdf(
+#   file = paste0(fig_path, "uni_krig.pdf"),
+#   height = 2.1 * 4,
+#   width = 7
+# )
+
+# par(mfrow = c(3, 2), mar = mar_default - c(3, 0, 3, 0))
+
+# Expected prior
+with(uk, image.plot(x, y, zprior, col = terrain.colors(nbcol), asp = 1, ylab = ""))
+with(uk, contour(x, y, zprior, nlevels = 10, add = TRUE))
+
+with(uk, persp(x, y, zprior,
+           theta = 135, phi = 30,
+           col = terrain.colors(nbcol)[facetcol],
+           lwd = 0.1, border = rgb(0, 0, 0, alpha = 0.8),
+           scale = FALSE,
+           xlab = "X", zlab = "Elevation",
+           xaxs = "i", yaxs = "i"
+         )
+)
+
+# Kriging prediction
+image.plot(uk, col = terrain.colors(nbcol), asp = 1)
 contour(uk, nlevels = 11, add = TRUE)
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
 
-with(uk, image.plot(x, y, var, col = inferno(n = 256), asp = 1))
-with(uk, contour(x, y, var, nlevels = 10, add = TRUE))
+persp(uk,
+      theta = 135, phi = 30,
+      col = terrain.colors(nbcol)[facetcol],
+      lwd = 0.1, border = rgb(0, 0, 0, alpha = 0.8),
+      scale = FALSE,
+      xlab = "X", zlab = "Elevation",
+      xaxs = "i", yaxs = "i"
+)
+
+# Prediction standard deviation
+with(uk, image.plot(x, y, sqrt(var), col = inferno(nbcol), asp = 1, ylab = ""))
+with(uk, contour(x, y, sqrt(var), nlevels = 5, add = TRUE))
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
 
+with(uk, persp(x, y, sqrt(var),
+           theta = 135, phi = 30,
+           col = inferno(nbcol)[facetcol],
+           lwd = 0.1, border = rgb(0, 0, 0, alpha = 0.8),
+           scale = FALSE,
+           xlab = "X", zlab = "Elevation",
+           xaxs = "i", yaxs = "i"
+         )
+)
 
+# dev.off()
 
 ## e)
 ord_kc2 <- krige.conv(
