@@ -398,10 +398,9 @@ A_r <- function(r){
 
 A_r_tilde <- A_r(postmean)
 
-
-
 A_r_hats <- apply(simulations, MARGIN=1, A_r)
 A_r_hat_u <- mean(A_r_hats) + z_005*sd(A_r_hats)
 A_r_hat_l <- mean(A_r_hats) - z_005*sd(A_r_hats)
 
 A_r_hat_int <- c(A_r_hat_l, A_r_hat_u)
+
