@@ -167,8 +167,6 @@ plotsimulations <- function(nofsims, simulations, grid, fn, save=FALSE){
   
   
   title="Realisations"
-  #title = paste(c("Realisations for sigma=",toString(sigma2),", method=",method))
-  #plot <-grid.arrange(p1,p2,p3,p4, nrow=2, top = title)
   if (save==TRUE){
     g <- arrangeGrob(p1, p2, p3, p4, nrow=2, top = title) #generates g
     ggsave(file=fn, g) #saves g
@@ -294,7 +292,6 @@ posteriorcov2 <- posteriordist_cov(mu_r=mu_r, d=d, Sigma_r=Sigma_r, Sigma_dr=Sig
 pred2 <- predictioninterval(L=L, mu_rd =posteriormean2, Sigma_rd=posteriorcov2, criticalvalue = z_005)
 
 
-#df1da <- predictionposterior(L=L, mu_r = mu_r, Sigma_r =Sigma_r, Sigma_dr=Sigma_dr1, observedpoints=observedpoints, criticalvalue=z_005)
 fig1da <- ggplot(data=pred1) +
   geom_line(aes(x=grid, y=mu), color="red") + 
   geom_line(aes(x=grid, y=lower), color="darkblue", linetype="dashed") +
@@ -323,7 +320,7 @@ ggsave(filename="1db.png", plot=fig1db)
 
 #1e
 #100 simulations for each model parameter
-nsim <- 100 # use 10 for now while testing
+nsim <- 100 
 
 
 #first model with observation error
@@ -348,12 +345,12 @@ df.1esim <- as.data.frame(t(simulations1), id.vars="simnumber")
 
 p1 <- ggplot(data = df.1esim, aes(x = L))
 for (i in 1:nsim) {
-  p1 <- p1 + geom_line(aes_string(y = paste0("V", i)))
+  p1 <- p1 + geom_line(aes_string(y = paste0("V", i)), color="lightblue" )
 }
 p1 +
   geom_line(data=df.1e1, aes(x=L, y=mean), color="red") +
-  geom_line(data=df.1e1, aes(x=L, y=lower.pred), color="darkblue", linetype="dotted") +
-  geom_line(data=df.1e1, aes(x=L, y=upper.pred), color="darkblue", linetype="dotted") +
+  geom_line(data=df.1e1, aes(x=L, y=lower.pred), color="darkblue") +
+  geom_line(data=df.1e1, aes(x=L, y=upper.pred), color="darkblue") +
   xlab("x") +
   ylab("r|d") +
   labs(title = "Prediction based on 100 realisations \nfrom prediction with observation error", color="Prediction") +
@@ -378,12 +375,12 @@ df.1e2 <- data.frame(x=L, mean = postmean2, lower.pred=lower2, upper.pred=upper2
 df.1esim2 <- as.data.frame(t(simulations1), id.vars="simnumber")
 p2 <- ggplot(data = df.1esim2, aes(x = L))
 for (i in 1:nsim) {
-  p2 <- p2 + geom_line(aes_string(y = paste0("V", i)))
+  p2 <- p2 + geom_line(aes_string(y = paste0("V", i)), color="lightblue")
 }
 p2 +
   geom_line(data=df.1e1, aes(x=L, y=mean), color="red") +
-  geom_line(data=df.1e1, aes(x=L, y=lower.pred), color="darkblue", linetype="dotted") +
-  geom_line(data=df.1e1, aes(x=L, y=upper.pred), color="darkblue", linetype="dotted") +
+  geom_line(data=df.1e1, aes(x=L, y=lower.pred), color="darkblue") +
+  geom_line(data=df.1e1, aes(x=L, y=upper.pred), color="darkblue") +
   xlab("x") +
   ylab("r|d") +
   labs(title = "Prediction based on 100 realisations \nfrom prediction without observation error", color="Prediction") +
