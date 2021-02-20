@@ -45,7 +45,8 @@ persp(lin, scale = FALSE,
 # dev.off()
 
 ## c)
-m = 70
+n <- 315
+m <- 70
 gridline <- seq(1, n, length.out = m)
 locs <- expand.grid(x = gridline, y = gridline)
 geodata <- as.geodata(data)
@@ -61,6 +62,8 @@ ord_kc <- krige.conv(
     kappa      = 1.5            # nu
   )
 )
+
+ord_kc$beta.est
 
 ok <- list(
   x    = gridline,
@@ -113,7 +116,6 @@ with(ok, persp(x, y, sqrt(var),
            xaxs = "i", yaxs = "i"
          )
 )
-
 # dev.off()
 
 ## d)
@@ -129,6 +131,8 @@ uni_kc <- krige.conv(
     kappa      = 1.5            # nu
   )
 )
+
+sprintf("%.5f", uni_kc$beta.est[2])
 
 uk <- list(
   x   = gridline,
