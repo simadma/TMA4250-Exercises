@@ -1,5 +1,4 @@
-#problem 3 test
-
+#problem 3
 # TMA4245 - Spatial statistics
 # Authors: Mads Adrian Simonsen and Karina Lilleborge
 # Exercise 1
