@@ -349,12 +349,15 @@ lower1 <- postmean1 -z_005*sqrt(postvar1)
 df.1e1 <- data.frame(x=L, mean = postmean1, lower.pred=lower1, upper.pred=upper1)
 df.1esim <- as.data.frame(t(simulations1), id.vars="simnumber")
 
-ggplot(data=df.1esim, aes(x=L)) +
-  geom_line(aes(color="simnumber")) +
+p1 <- ggplot(data = df.1esim, aes(x = L))
+for (i in 1:nsim) {
+  p1 <- p1 + geom_line(aes_string(y = paste0("V", i)))
+}
+p1 +
   geom_line(data=df.1e1, aes(x=L, y=mean), color="red") +
   geom_line(data=df.1e1, aes(x=L, y=lower.pred), color="darkblue", linetype="dotted") +
   geom_line(data=df.1e1, aes(x=L, y=upper.pred), color="darkblue", linetype="dotted") +
-  xlab(TeX("Distance, $\\tau$")) +
+  xlab("x") +
   ylab("r|d") +
   labs(title = "Prediction based on 100 realisations \nfrom prediction with observation error", color="Prediction") +
   # scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
@@ -362,33 +365,37 @@ ggplot(data=df.1esim, aes(x=L)) +
 ggsave("pred100wobserr.pdf")
 
 
-
-
 #second model with no observation error
 #posterior
 mu_rd2 <- posteriormean2
 Sigma_rd2 <- posteriorcov2
-
+set.seed(654321)
 simulations2 <- mvrnorm(n=nsim, mu=mu_rd2, Sigma=Sigma_rd2)
 
 postmean2 <-apply(simulations2, MARGIN = 2, mean)
 postvar2 <- apply(simulations2, MARGIN = 2, var)
-
 upper2 <- postmean2 +z_005*sqrt(postvar2)
 lower2 <- postmean2 -z_005*sqrt(postvar2)
 
 df.1e2 <- data.frame(x=L, mean = postmean2, lower.pred=lower2, upper.pred=upper2)
-ggplot(data=df.1e2) +
-  geom_line(aes(x=L, y=mean), color="red") +
-  geom_line(aes(x=L, y=lower.pred), color="darkblue", linetype="dotted") +
-  geom_line(aes(x=L, y=upper.pred), color="darkblue", linetype="dotted") +
-  xlab(TeX("Distance, $\\tau$")) +
+df.1esim2 <- as.data.frame(t(simulations1), id.vars="simnumber")
+p2 <- ggplot(data = df.1esim2, aes(x = L))
+for (i in 1:nsim) {
+  p2 <- p2 + geom_line(aes_string(y = paste0("V", i)))
+}
+p2 +
+  geom_line(data=df.1e1, aes(x=L, y=mean), color="red") +
+  geom_line(data=df.1e1, aes(x=L, y=lower.pred), color="darkblue", linetype="dotted") +
+  geom_line(data=df.1e1, aes(x=L, y=upper.pred), color="darkblue", linetype="dotted") +
+  xlab("x") +
   ylab("r|d") +
-  labs(title = "Prediction based on 100 realisations \nfrom posterior without observation error", color="Prediction") +
-  scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
+  labs(title = "Prediction based on 100 realisations \nfrom prediction without observation error", color="Prediction") +
+  # scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
   theme_minimal()
+
 ggsave("pred100woobserr.pdf")
 
+#mads
 
 #1f
 
