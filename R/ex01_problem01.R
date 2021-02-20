@@ -8,7 +8,6 @@ library(latex2exp)
 library(tidyverse)
 library(reshape2)
 #problem 1
-#L=[1,50]
 L <- 1:50
 taus <- L-1
 
