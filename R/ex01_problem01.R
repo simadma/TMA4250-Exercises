@@ -397,16 +397,16 @@ ggsave("pred100woobserr.pdf")
 
 
 #1f
-
+#function
 A_r <- function(r){
   return(sum((r>2)*(r-2)))
 }
-
+#tilde A_r
 A_r_tilde <- A_r(postmean)
-
+#hat A_r
 A_r_hats <- apply(simulations, MARGIN=1, A_r)
 A_r_hat_u <- mean(A_r_hats) + z_005*sd(A_r_hats)
 A_r_hat_l <- mean(A_r_hats) - z_005*sd(A_r_hats)
-
+#interval for hat A_r
 A_r_hat_int <- c(A_r_hat_l, A_r_hat_u)
 
