@@ -1,4 +1,9 @@
-#Code for project 1 in spatial statistics
+#Project 1
+#TMA4250 Spatial statistics
+#Authors: Mads Adrian Simonsen and Karina Lilleborge
+#Problem 1
+
+#libraries
 library(MASS)
 library(fields)
 library(akima)
@@ -7,8 +12,10 @@ library(gridExtra)
 library(latex2exp)
 library(tidyverse)
 library(reshape2)
-#problem 1
+
+#grid
 L <- 1:50
+#distances
 taus <- L-1
 
 #model parameters
