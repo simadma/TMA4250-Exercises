@@ -378,9 +378,9 @@ for (i in 1:nsim) {
   p2 <- p2 + geom_line(aes_string(y = paste0("V", i)), color="lightblue")
 }
 p2 +
-  geom_line(data=df.1e1, aes(x=L, y=mean), color="red") +
-  geom_line(data=df.1e1, aes(x=L, y=lower.pred), color="darkblue") +
-  geom_line(data=df.1e1, aes(x=L, y=upper.pred), color="darkblue") +
+  geom_line(data=df.1e2, aes(x=L, y=mean), color="red") +
+  geom_line(data=df.1e2, aes(x=L, y=lower.pred), color="darkblue") +
+  geom_line(data=df.1e2, aes(x=L, y=upper.pred), color="darkblue") +
   xlab("x") +
   ylab("r|d") +
   labs(title = "Prediction based on 100 realisations \nfrom prediction without observation error", color="Prediction") +
