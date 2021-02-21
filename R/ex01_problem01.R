@@ -12,7 +12,7 @@ library(gridExtra)
 library(latex2exp)
 library(tidyverse)
 library(reshape2)
-
+fig_path <- "./Figures/"
 #grid
 L <- 1:50
 #distances
@@ -94,32 +94,31 @@ df_vario[df_vario$type == "Matérn" & df_vario$nu == 3 & df_vario$sigma_sq == 5,
 
 corr <- ggplot(data = df_cov, aes(x=tau, y=rho, color=as.factor(nu), linetype = type)) +
   geom_line() +
-  #scale_color_manual(name="Type", labels=c("1", "2", "3", "4", "5", "6", "7", "8"), values = c()) +
   xlab(TeX("Distance, $\\tau$")) +
   ylab(TeX("Correlation, $\\rho_r(\\tau)$")) +
+  labs(color=TeX("$\\nu_r$"), linetype="Corr.function") +
   theme_bw()  
 corr
 
-#ggsave("correlation.png", plot=corr)
+ggsave(file = paste0(fig_path,"correlation.pdf"), plot=corr)
 
 vario <- ggplot(data = df_vario, aes(x=tau, y=gamma, color=as.factor(nu), linetype = type)) +
   geom_line() +
   facet_grid(. ~ sigma_sq) +
-  #scale_color_manual(name="Type", labels=c("1", "2", "3", "4", "5", "6", "7", "8"), values = c()) +
   xlab(TeX("Distance, $\\tau$")) +
   ylab(TeX("Variogram, $\\gamma_r(\\tau)$")) +
-  #labs(title = TeX("Variogram, $\\gamma_r(\\tau)$")) +
+  labs(color = TeX("$\\nu_r$"), linetype="Corr.function") +
   theme_bw()  
 vario
 
-#ggsave("variogram.png", plot=vario)
+ggsave(file=paste0(fig_path,"variogram.pdf"), plot=vario)
 
 
 
 
 
 #b)
-#prior model is N_50(mu, sigma)?
+#prior model is N_50(mu, sigma)
 
 #function to convert the vector of covariances to the variance-covariance matrix
 converttosigma <- function(cov, sigma2){
@@ -151,32 +150,18 @@ plotsimulations <- function(nofsims, simulations, grid, fn, save=FALSE){
   df <- data.frame(simulations) #data frame for plotting
   
   p1 <- ggplot(data=df, aes(x=grid, y=X1)) +
-    geom_point() +
+    geom_line(aes(color="Sim.1"), show.legend=FALSE) +
+    geom_line(aes(x=grid, y=X2, color="Sim.2"), show.legend=FALSE) +
+    geom_line(aes(x=grid, y=X3, color="Sim.3"), show.legend=FALSE) + 
+    geom_line(aes(x=grid, y=X4, color="Sim.4"), show.legend=FALSE) + 
     xlab("x") +
     ylab("r(x)") +
-    theme_bw()
-  p2 <- ggplot(data=df, aes(x=grid, y=X2)) +
-    geom_point() +
-    xlab("x") +
-    ylab("r(x)") +
-    theme_bw()
+    theme_bw() +
+    theme(legend.position = "top")
+
   
-  p3 <- ggplot(data=df, aes(x=grid, y=X3)) +
-    geom_point() +
-    xlab("x") +
-    ylab("r(x)") +
-    theme_bw()
-  p4 <- ggplot(data=df, aes(x=grid, y=X4)) +
-    geom_point() +
-    xlab("x") +
-    ylab("r(x)") +
-    theme_bw()
-  
-  
-  title="Realisations"
   if (save==TRUE){
-    g <- arrangeGrob(p1, p2, p3, p4, nrow=2, top = title) #generates g
-    ggsave(file=fn, g) #saves g
+    ggsave(file=paste0(fig_path,fn), p1) #saves p1
   }
 }
 
@@ -184,50 +169,50 @@ plotsimulations <- function(nofsims, simulations, grid, fn, save=FALSE){
 #1: powered exponential, sigma=1, nu=1
 set.seed(1)
 simulation1 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov1, sigma2=sigma2_r[1])
-plotsimulations(nofsims=4,simulations=simulation1, grid=L, fn = "1b1p.pdf")#, save= TRUE)
+plotsimulations(nofsims=4,simulations=simulation1, grid=L, fn = "1b1p.pdf", save= TRUE)
 
 
 #2: powered exponential, sigma=5, nu=1
 set.seed(2)
 simulation2 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov2, sigma2=sigma2_r[2])
-plotsimulations(nofsims=4,simulations=simulation2, grid=L, fn = "1b2p.pdf")#, save= TRUE)
+plotsimulations(nofsims=4,simulations=simulation2, grid=L, fn = "1b2p.pdf", save= TRUE)
 
 
 
 #3: powered exponential, sigma=1, nu=1.9
 set.seed(3)
 simulation3 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov3, sigma2=sigma2_r[1])
-plotsimulations(nofsims=4,simulations=simulation3, grid=L, fn = "1b3p.pdf")#, save= TRUE)
+plotsimulations(nofsims=4,simulations=simulation3, grid=L, fn = "1b3p.pdf", save= TRUE)
 
 
 
 #4: powered exponential, sigma=5, nu=1.9
 set.seed(4)
 simulation4 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov4, sigma2=sigma2_r[2])
-plotsimulations(nofsims=4,simulations=simulation4, grid=L, fn = "1b4p.pdf")#, save= TRUE)
+plotsimulations(nofsims=4,simulations=simulation4, grid=L, fn = "1b4p.pdf", save= TRUE)
 
 
 #5: Matern, sigma=1, nu=1
 set.seed(5)
 simulation5 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov5, sigma2=sigma2_r[1])
-plotsimulations(nofsims=4,simulations=simulation5, grid=L, fn = "1b5m.pdf")#, save= TRUE)
+plotsimulations(nofsims=4,simulations=simulation5, grid=L, fn = "1b5m.pdf", save= TRUE)
 
 #6: Matern, sigma=5, nu=1
 set.seed(6)
 simulation6<-getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov6, sigma2=sigma2_r[2])
-plotsimulations(nofsims=4,simulations=simulation6, grid=L, fn = "1b6m.pdf")#, save= TRUE)
+plotsimulations(nofsims=4,simulations=simulation6, grid=L, fn = "1b6m.pdf", save= TRUE)
 
 
 #7: Matern, sigma=1, nu=3
 set.seed(7)
 simulation7 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov7, sigma2=sigma2_r[1])
-plotsimulations(nofsims=4,simulations=simulation7, grid=L, fn = "1b7m.pdf")#, save= TRUE)
+plotsimulations(nofsims=4,simulations=simulation7, grid=L, fn = "1b7m.pdf", save= TRUE)
 
 
 #8: Matern, sigma=5, nu=3
 set.seed(8)
 simulation8 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov8, sigma2=sigma2_r[2])
-plotsimulations(nofsims=4,simulations=simulation8, grid=L, fn = "1b8m.pdf")#, save= TRUE)
+plotsimulations(nofsims=4,simulations=simulation8, grid=L, fn = "1b8m.pdf", save= TRUE)
 
 
 #1d 
@@ -300,27 +285,25 @@ pred2 <- predictioninterval(L=L, mu_rd =posteriormean2, Sigma_rd=posteriorcov2, 
 
 
 fig1da <- ggplot(data=pred1) +
-  geom_line(aes(x=grid, y=mu), color="red") + 
-  geom_line(aes(x=grid, y=lower), color="darkblue", linetype="dashed") +
-  geom_line(aes(x=grid, y=upper), color="darkblue", linetype="dashed") +
-  #geom_point(aes(x=observedpoints, y=mu[observedpoints]), color="black") + #points where we have done observations
+  geom_line(aes(x=grid, y=mu, color="mean"), show.legend = FALSE) + 
+  geom_line(aes(x=grid, y=lower, color="predint"), show.legend = FALSE, linetype="dashed") +
+  geom_line(aes(x=grid, y=upper, color="predint"), show.legend = FALSE, linetype="dashed") +
   xlab("x") +
   ylab("r|d") + 
-  labs(title="Conditional expectation with a 90% prediction interval. \nObservation error is present ") + 
-  theme_minimal()
+  labs(color="") + 
+  theme_bw()
 fig1da
-ggsave(filename="1da.pdf", plot=fig1da)
+ggsave(filename=paste0(fig_path,"1da.pdf"), plot=fig1da)
 fig1db <- ggplot(data=pred2) +
-  geom_line(aes(x=grid, y=mu), color="red") + 
-  geom_line(aes(x=grid, y=lower), color="darkblue", linetype="dashed") +
-  geom_line(aes(x=grid, y=upper), color="darkblue", linetype="dashed") +
-  #geom_point(aes(x=observedpoints, y=mu[observedpoints]), color="black") + #points where we have done observations
+  geom_line(aes(x=grid, y=mu, color="mean"), show.legend=FALSE) + 
+  geom_line(aes(x=grid, y=lower, color="predint"), show.legend = FALSE, linetype="dashed") +
+  geom_line(aes(x=grid, y=upper, color="predint"), show.legend = FALSE, linetype="dashed") +
   xlab("x") +
   ylab("r|d") + 
-  labs(title="Conditional expectation with a 90% prediction interval. \nNo error in the observations") +
-  theme_minimal()
+  labs() +
+  theme_bw()
 fig1db
-ggsave(filename="1db.pdf", plot=fig1db)
+ggsave(filename=paste0(fig_path,"1db.pdf"), plot=fig1db)
 
 
 
@@ -403,11 +386,12 @@ A_r <- function(r){
   return(sum((r>2)*(r-2)))
 }
 #tilde A_r
-A_r_tilde <- A_r(postmean)
+A_r_tilde <- A_r(postmean2)
 #hat A_r
-A_r_hats <- apply(simulations, MARGIN=1, A_r)
-A_r_hat_u <- mean(A_r_hats) + z_005*sd(A_r_hats)
-A_r_hat_l <- mean(A_r_hats) - z_005*sd(A_r_hats)
+A_r_hats <- apply(simulations2, MARGIN=1, A_r)
+A_r_hat <-mean(A_r_hats)
+A_r_hat_u <- A_r_hat + z_005*sd(A_r_hats)
+A_r_hat_l <- A_r_hat - z_005*sd(A_r_hats)
 #interval for hat A_r
 A_r_hat_int <- c(A_r_hat_l, A_r_hat_u)
 
