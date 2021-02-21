@@ -1,4 +1,3 @@
-#problem 3
 # TMA4245 - Spatial statistics
 # Authors: Mads Adrian Simonsen and Karina Lilleborge
 # Exercise 1
@@ -171,41 +170,22 @@ est.vario64 = pow.exp.variogram(distance, sigma = df.ml$sigmasq.hat[4],xi=df.ml$
 est.vario100 = pow.exp.variogram(distance, sigma = df.ml$sigmasq.hat[5],xi=df.ml$xi.hat[5])
 
 df.est.variogram <- data.frame(distance=distance, exact=exact.vario, est9=est.vario9, est36=est.vario36, est64=est.vario64, est100=est.vario100)
-# op <- par(mfrow=c(2,2))
-# #compare the real variogram with the one estimated with 9 points
-# plot(distance, pow.exp.variogram(distance, sigma_r = df.ml$sigmasq.hat[2],df.ml$xi.hat[2]), ylab = "variogram")
-# lines(distance, pow.exp.variogram(distance, sigma_r = df.ml$sigmasq.hat[1],df.ml$xi.hat[1]))
-# #now with 36 points
-# plot(distance, pow.exp.variogram(distance, sigma_r = df.ml$sigmasq.hat[3],df.ml$xi.hat[3]), ylab = "variogram")
-# lines(distance, pow.exp.variogram(distance, sigma_r = df.ml$sigmasq.hat[1],df.ml$xi.hat[1]))
-# #64 points
-# plot(distance, pow.exp.variogram(distance, sigma_r = df.ml$sigmasq.hat[4],df.ml$xi.hat[4]), ylab = "variogram")
-# lines(distance, pow.exp.variogram(distance, sigma_r = df.ml$sigmasq.hat[1],df.ml$xi.hat[1]))
-# #100 points
-# plot(distance, pow.exp.variogram(distance, sigma_r = df.ml$sigmasq.hat[5],df.ml$xi.hat[5]), ylab = "variogram")
-# lines(distance, pow.exp.variogram(distance, sigma_r = df.ml$sigmasq.hat[1],df.ml$xi.hat[1]))
-# par(op)
 
 
-
-
-# row.names(df.ml) <- c("true.value","full.model", "9obs", "36obs", "64obs", "100obs")
 # #color assigning
-estimates <- c("exact", "9 obs", "36 obs", "64 obs", "100 obs")
+estimates <- c("Exact function"="red", "9 points"="lightblue", "36 points"="purple", "64 points"="orange", "100 points"="lime")
 
 
 ggplot(data=df.est.variogram) +
   geom_line(aes(x=distance, y=exact, color = "Exact function")) +
-  xlab("Distance") + 
-  ylab("Variogram")+
+  xlab(TeX("Distance, $\\tau$")) + 
+  ylab(TeX("Variogram, $\\hat\\gamma$"))+
   geom_line(aes(x=distance, y=est9, color="9 points"))+
   geom_line(aes(x=distance, y=est36, color="36 points"))+
   geom_line(aes(x=distance, y=est64, color="64 points"))+
   geom_line(aes(x=distance, y=est100, color="100 points"))+
-  theme(legend.position = "top")
-
-
-
+  theme(legend.position = "top") +
+  theme_bw()
 
 
 ggsave("parameterestimation.pdf")
