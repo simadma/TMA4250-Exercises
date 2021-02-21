@@ -356,7 +356,7 @@ p1 +
   labs(title = "Prediction based on 100 realisations \nfrom prediction with observation error", color="Prediction") +
   # scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
   theme_minimal()
-ggsave("pred100wobserr.pdf", plot=p1)
+ggsave("pred100wobserr.pdf")
 
 
 #second model with no observation error
@@ -372,7 +372,7 @@ upper2 <- postmean2 +z_005*sqrt(postvar2)
 lower2 <- postmean2 -z_005*sqrt(postvar2)
 
 df.1e2 <- data.frame(x=L, mean = postmean2, lower.pred=lower2, upper.pred=upper2)
-df.1esim2 <- as.data.frame(t(simulations1), id.vars="simnumber")
+df.1esim2 <- as.data.frame(t(simulations2), id.vars="simnumber")
 p2 <- ggplot(data = df.1esim2, aes(x = L))
 for (i in 1:nsim) {
   p2 <- p2 + geom_line(aes_string(y = paste0("V", i)), color="lightblue")
@@ -387,7 +387,7 @@ p2 +
   # scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
   theme_minimal()
 
-ggsave("pred100woobserr.pdf", plot= p2)
+ggsave("pred100woobserr.pdf")
 
 
 #1f
