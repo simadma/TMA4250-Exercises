@@ -356,7 +356,7 @@ p1 +
   labs(title = "Prediction based on 100 realisations \nfrom prediction with observation error", color="Prediction") +
   # scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
   theme_minimal()
-ggsave("pred100wobserr.pdf")
+ggsave("pred100wobserr.pdf", plot=p1)
 
 
 #second model with no observation error
@@ -387,7 +387,7 @@ p2 +
   # scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
   theme_minimal()
 
-ggsave("pred100woobserr.pdf")
+ggsave("pred100woobserr.pdf", plot= p2)
 
 
 #1f
