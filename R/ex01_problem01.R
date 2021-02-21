@@ -302,7 +302,7 @@ fig1da <- ggplot(data=pred1) +
   labs(title="Conditional expectation with a 90% prediction interval. \nObservation error is present ") + 
   theme_minimal()
 fig1da
-ggsave(filename="1da.png", plot=fig1da)
+ggsave(filename="1da.pdf", plot=fig1da)
 fig1db <- ggplot(data=pred2) +
   geom_line(aes(x=grid, y=mu), color="red") + 
   geom_line(aes(x=grid, y=lower), color="darkblue", linetype="dashed") +
@@ -313,7 +313,7 @@ fig1db <- ggplot(data=pred2) +
   labs(title="Conditional expectation with a 90% prediction interval. \nNo error in the observations") +
   theme_minimal()
 fig1db
-ggsave(filename="1db.png", plot=fig1db)
+ggsave(filename="1db.pdf", plot=fig1db)
 
 
 
