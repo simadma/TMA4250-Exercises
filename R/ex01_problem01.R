@@ -12,6 +12,7 @@ library(gridExtra)
 library(latex2exp)
 library(tidyverse)
 library(reshape2)
+#figure path for saving
 fig_path <- "./Figures/"
 #grid
 L <- 1:50
@@ -98,9 +99,9 @@ corr <- ggplot(data = df_cov, aes(x=tau, y=rho, color=as.factor(nu), linetype = 
   ylab(TeX("Correlation, $\\rho_r(\\tau)$")) +
   labs(color=TeX("$\\nu_r$"), linetype="Corr.function") +
   theme_bw()  
+pdf(file = paste0(fig_path,"correlation.pdf"), width = 4, height=4)
 corr
-
-ggsave(file = paste0(fig_path,"correlation.pdf"), plot=corr)
+dev.off()
 
 vario <- ggplot(data = df_vario, aes(x=tau, y=gamma, color=as.factor(nu), linetype = type)) +
   geom_line() +
@@ -109,9 +110,11 @@ vario <- ggplot(data = df_vario, aes(x=tau, y=gamma, color=as.factor(nu), linety
   ylab(TeX("Variogram, $\\gamma_r(\\tau)$")) +
   labs(color = TeX("$\\nu_r$"), linetype="Corr.function") +
   theme_bw()  
-vario
 
-ggsave(file=paste0(fig_path,"variogram.pdf"), plot=vario)
+pdf(file = paste0(fig_path,"variogram.pdf"), width = 4, height=4)
+vario
+dev.off()
+
 
 
 
@@ -344,8 +347,7 @@ p1 +
   xlab("x") +
   ylab("r|d") +
   labs(title = "Prediction based on 100 realisations \nfrom prediction with observation error", color="Prediction") +
-  # scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
-  theme_minimal()
+  theme_bw()
 ggsave("pred100wobserr.pdf")
 
 
@@ -374,8 +376,7 @@ p2 +
   xlab("x") +
   ylab("r|d") +
   labs(title = "Prediction based on 100 realisations \nfrom prediction without observation error", color="Prediction") +
-  # scale_color_manual(values= c("mean" = 'red', "lower"='blue', "upper"='blue')) +
-  theme_minimal()
+  theme_bw()
 
 ggsave("pred100woobserr.pdf")
 
