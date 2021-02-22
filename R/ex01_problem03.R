@@ -12,8 +12,8 @@ library(latex2exp)
 library(tidyverse)
 library(reshape2)
 
-fig_path <- "./Figures/"
-##Problem 3 a)
+fig_path <- "./Figures/" #For saving figures
+##a)
 #distances from different points in the grid
 distance <- 0:43
 #regular grid 
