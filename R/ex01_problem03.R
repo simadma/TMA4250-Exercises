@@ -91,8 +91,8 @@ data36 <- field$data[rpoints36]
 emp_variogram36 <- variog(coords=rlocations36, data=data36)
 
 pdf(paste0(fig_path,"empiricalvariogram36points.pdf"), width = 4*2, height = 4*1.5)
-plot(emp_variogram36, type="l", lty=2)
-lines(distance, sigma_r*(1-exp(-1*distance/xi_r)))
+plot(emp_variogram36, type="l")
+lines(distance, sigma_r*(1-exp(-1*distance/xi_r)), lty=2)
 dev.off()
 
 ## e) Repeat d) with 9, 64 and 100 points
@@ -122,14 +122,14 @@ emp_variogram100 <- variog(coords=rlocations100, data=data100)
 
 pdf(paste0(fig_path,"empiricalvariograms9-64-100.pdf"), width=6, height=2) #open pdf
 op <- par(mfrow=c(1,3)) #start subplotting
-plot(emp_variogram9, type="l", lty=2)
-lines(distance, sigma_r*(1-exp(-1*distance/xi_r)))
+plot(emp_variogram9, type="l")
+lines(distance, sigma_r*(1-exp(-1*distance/xi_r)), lty=2)
 
-plot(emp_variogram64, type="l", lty=2)
-lines(distance, sigma_r*(1-exp(-1*distance/xi_r)))
+plot(emp_variogram64, type="l")
+lines(distance, sigma_r*(1-exp(-1*distance/xi_r)), lty=2)
 
-plot(emp_variogram100, type="l", lty=2)
-lines(distance, sigma_r*(1-exp(-1*distance/xi_r)))
+plot(emp_variogram100, type="l")
+lines(distance, sigma_r*(1-exp(-1*distance/xi_r)), lty=2)
 dev.off() #close pdf
 
 #loglikelihood estimation on sigma and xi
