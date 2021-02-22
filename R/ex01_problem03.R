@@ -12,7 +12,7 @@ library(latex2exp)
 library(tidyverse)
 library(reshape2)
 
-
+fig_path <- "./Figures/"
 ##Problem 3 a)
 #distances from different points in the grid
 distance <- 0:43
@@ -48,7 +48,7 @@ empirical_variogram3 <- variog(field3)
 
 
 #plots for the gaussian random fields
-pdf("grfs.pdf", width = 6, height = 2) #open pdf
+pdf(paste0(fig_path,"grfs.pdf"), width = 6, height = 2) #open pdf
 op <- par(mfrow=c(1,3)) #initiate subplotting
 contour(field1) #,  plot.title = {par(cex.main=1);title(main = "Realization 1",xlab = "x", ylab = "y")})
 contour(field2) #, plot.title = {par(cex.main=1);title(main = "Realization 2",xlab = "x", ylab = "y")})
@@ -184,8 +184,9 @@ ggplot(data=df.est.variogram) +
   geom_line(aes(x=distance, y=est36, color="36 points"))+
   geom_line(aes(x=distance, y=est64, color="64 points"))+
   geom_line(aes(x=distance, y=est100, color="100 points"))+
+  #labs(color="Estimate based on") + 
   theme(legend.position = "top") +
   theme_bw()
 
 
-ggsave("parameterestimation.pdf")
+ggsave(file = paste0(fig_path,"parameterestimation.pdf"))
