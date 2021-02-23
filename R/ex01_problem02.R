@@ -20,28 +20,31 @@ facetcol <- cut(zfacet, nbcol)
 
 # Plot
 # pdf(
-#   file = paste0(fig_path, "interp_obs.pdf"),
+#   file = paste0(fig_path, "interp_obs_a.pdf"),
 #   height = 4,
-#   width = 7
+#   width = 4.9
 # )
 
 # Plot
-mar_default <- c(5, 4, 4, 2) + 0.1
-# par(mfrow = c(1, 2))
-
+# par(mar = c(2, 2, 0, 0) + 0.5)
 image.plot(lin, col = terrain.colors(nbcol), asp = 1)
 contour(lin, nlevels = 11, add = TRUE)
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
+# dev.off()
+
+# pdf(
+#   file = paste0(fig_path, "interp_obs_b.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(1, 1.5, 0, 0.5))
 persp(lin, scale = FALSE,
   theta = 135, phi = 30,
   col = terrain.colors(nbcol)[facetcol],
   lwd = 0.1, border = rgb(0, 0, 0, alpha = 0.8),
-  xlab = "X", zlab = "Elevation",
-  xaxs = "i", yaxs = "i"
+  xlab = "X", zlab = "Elevation"
 )
-
-
 # dev.off()
 
 ## c)
@@ -77,21 +80,28 @@ ok <- list(
 zfacet <- with(ok, z[-1, -1] + z[-1, -ncol(z)] + z[-nrow(z), -1] + z[-nrow(z), -ncol(z)])
 facetcol <- cut(zfacet, nbcol)
 
-## Plot
+# Plot
 # pdf(
-#   file = paste0(fig_path, "ord_krig.pdf"),
-#   height = 1.4 * 4,
-#   width = 7
+#   file = paste0(fig_path, "ord_krig_a.pdf"),
+#   height = 4,
+#   width = 4.9
 # )
-
-# par(mfrow = c(2, 2), mar = mar_default - c(3, 0, 3, 0))
+# par(mar = c(2, 2, 0, 0) + 0.5)
 
 # Kriging prediction
 image.plot(ok, col = terrain.colors(nbcol), asp = 1)
 contour(ok, nlevels = 11, add = TRUE)
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
+# dev.off()
 
+
+# pdf(
+#   file = paste0(fig_path, "ord_krig_b.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(1, 1.5, 0, 0.5))
 persp(ok,
   theta = 135, phi = 30,
   col = terrain.colors(nbcol)[facetcol],
@@ -100,13 +110,28 @@ persp(ok,
   xlab = "X", zlab = "Elevation",
   xaxs = "i", yaxs = "i"
 )
+# dev.off()
 
 # Prediction standard deviation
+# pdf(
+#   file = paste0(fig_path, "ord_krig_c.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(2, 2, 0, 0) + 0.5)
 with(ok, image.plot(x, y, sqrt(var), col = inferno(nbcol), asp = 1, ylab = ""))
 with(ok, contour(x, y, sqrt(var), nlevels = 5, add = TRUE))
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
+# dev.off()
 
+
+# pdf(
+#   file = paste0(fig_path, "ord_krig_d.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(1, 1 + 1.5, 0, 0.5))
 with(ok, persp(x, y, sqrt(var),
            theta = 135, phi = 30,
            col = inferno(nbcol)[facetcol],
@@ -155,17 +180,23 @@ facetcol <- cut(zfacet, nbcol)
 
 ## Plot
 # pdf(
-#   file = paste0(fig_path, "uni_krig.pdf"),
-#   height = 2.1 * 4,
-#   width = 7
+#   file = paste0(fig_path, "uni_krig_a.pdf"),
+#   height = 4,
+#   width = 4.9
 # )
-
-# par(mfrow = c(3, 2), mar = mar_default - c(3, 0, 3, 0))
+# par(mar = c(2, 2, 0, 0) + 0.5)
 
 # Expected prior
 with(uk, image.plot(x, y, zprior, col = terrain.colors(nbcol), asp = 1, ylab = ""))
 with(uk, contour(x, y, zprior, nlevels = 10, add = TRUE))
+# dev.off()
 
+# pdf(
+#   file = paste0(fig_path, "uni_krig_b.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(1, 1.5, 0, 0.5))
 with(uk, persp(x, y, zprior,
            theta = 135, phi = 30,
            col = terrain.colors(nbcol)[facetcol],
@@ -175,13 +206,28 @@ with(uk, persp(x, y, zprior,
            xaxs = "i", yaxs = "i"
          )
 )
+# dev.off()
 
+
+# pdf(
+#   file = paste0(fig_path, "uni_krig_c.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(2, 2, 0, 0) + 0.5)
 # Kriging prediction
 image.plot(uk, col = terrain.colors(nbcol), asp = 1)
 contour(uk, nlevels = 11, add = TRUE)
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
+# dev.off()
 
+# pdf(
+#   file = paste0(fig_path, "uni_krig_d.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(1, 1.5, 0, 0.5))
 persp(uk,
       theta = 135, phi = 30,
       col = terrain.colors(nbcol)[facetcol],
@@ -190,13 +236,28 @@ persp(uk,
       xlab = "X", zlab = "Elevation",
       xaxs = "i", yaxs = "i"
 )
+# dev.off()
 
 # Prediction standard deviation
+
+# pdf(
+#   file = paste0(fig_path, "uni_krig_e.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(2, 2, 0, 0) + 0.5)
 with(uk, image.plot(x, y, sqrt(var), col = inferno(nbcol), asp = 1, ylab = ""))
 with(uk, contour(x, y, sqrt(var), nlevels = 5, add = TRUE))
 with(data, points(x, y, pch = 4, col = "white"))
 with(data, points(x, y, pch = 3, col = "black"))
+# dev.off()
 
+# pdf(
+#   file = paste0(fig_path, "uni_krig_f.pdf"),
+#   height = 4,
+#   width = 4.9
+# )
+# par(mar = c(1, 1.5 + 1, 0, 0.5))
 with(uk, persp(x, y, sqrt(var),
            theta = 135, phi = 30,
            col = inferno(nbcol)[facetcol],
@@ -206,7 +267,6 @@ with(uk, persp(x, y, sqrt(var),
            xaxs = "i", yaxs = "i"
          )
 )
-
 # dev.off()
 
 ## e)
