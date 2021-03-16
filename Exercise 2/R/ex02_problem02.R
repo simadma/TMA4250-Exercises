@@ -21,7 +21,7 @@ alpha <- read.delim(obsprobpath, header = TRUE, sep=" ")
 # fig1
 cbPalette <- c("white", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 fig1 <- ggplot(data=d, aes(x=x, y=y, color=as.factor(N_obs))) +
-  geom_point() +
+  geom_point(size=0.9) +
   scale_colour_manual(values = cbPalette) +
   labs(color="Tree count")+
   labs(title="Observed number of pine trees") +
@@ -59,73 +59,52 @@ cat("Estimation of lambda_k is ", lambda_hat, "per square meter")
 # Generate 6 realizations from the prior
 nsim <- 6 #number of simulations
 n <- 900 #number of grid points
-realizations <- matrix(0, nrow=nsim, ncol=n)
+realizations <- matrix(0, nrow=nsim, ncol=n) #for storage
 for (i in 1:nsim){
   realizations[i,] <- rpois(n=n, lambda=lambda_hat)
 }
 
-
-sim1 <- data.frame(x=d$x, y=d$y, N_obs=realizations[1,])
-figc1<-ggplot(data=sim1, aes(x=x, y=y, color=as.factor(N_obs))) +
-  geom_point() +
-  labs(color="Tree count")+
-  scale_colour_manual(values = cbPalette) +
-  theme_minimal()
-ggsave("02realization1.pdf",
-       plot = figc1, path = fig_path,
-       width = w, height = h, units = "cm"
-)
-sim2 <- data.frame(x=d$x, y=d$y, N_obs=realizations[2,])
-figc2<-ggplot(data=sim2, aes(x=x, y=y, color=as.factor(N_obs))) +
-  geom_point() +
-  labs(color="Tree count")+
-  scale_colour_manual(values = cbPalette) +
-  theme_minimal()
-ggsave("02realization2.pdf",
-       plot = figc2, path = fig_path,
-       width = w, height = h, units = "cm"
-)
-sim3 <- data.frame(x=d$x, y=d$y, N_obs=realizations[3,])
-figc3<-ggplot(data=sim3, aes(x=x, y=y, color=as.factor(N_obs))) +
-  geom_point() +
-  labs(color="Tree count")+
-  scale_colour_manual(values = cbPalette) +
-  theme_minimal()
-ggsave("02realization3.pdf",
-       plot = figc3, path = fig_path,
-       width = w, height = h, units = "cm"
-)
-sim4 <- data.frame(x=d$x, y=d$y, N_obs=realizations[4,])
-figc4<-ggplot(data=sim4, aes(x=x, y=y, color=as.factor(N_obs))) +
-  geom_point() +
-  labs(color="Tree count")+
-  scale_colour_manual(values = cbPalette) +
-  theme_minimal()
-ggsave("02realization4.pdf",
-       plot = figc4, path = fig_path,
-       width = w, height = h, units = "cm"
-)
-sim5 <- data.frame(x=d$x, y=d$y, N_obs=realizations[5,])
-figc5<-ggplot(data=sim5, aes(x=x, y=y, color=as.factor(N_obs))) +
-  geom_point() +
-  labs(color="Tree count")+
-  scale_colour_manual(values = cbPalette) +
-  theme_minimal()
-ggsave("02realization5.pdf",
-       plot = figc5, path = fig_path,
-       width = w, height = h, units = "cm"
-)
-sim6 <- data.frame(x=d$x, y=d$y, N_obs=realizations[6,])
-figc6<-ggplot(data=sim6, aes(x=x, y=y, color=as.factor(N_obs))) +
-  geom_point() +
-  labs(color="Tree count")+
-  scale_colour_manual(values = cbPalette) +
-  theme_minimal()
-ggsave("02realization6.pdf",
-       plot = figc6, path = fig_path,
-       width = w, height = h, units = "cm"
-)
+for (i in 1:nsim){
+  sim_i <- data.frame(x=d$x, y=d$y, N_obs=realizations[i,])
+  figc_i<-ggplot(data=sim_i, aes(x=x, y=y, color=as.factor(N_obs))) +
+    geom_point() +
+    labs(color="Tree count")+
+    scale_colour_manual(values = cbPalette) +
+    theme_minimal()
+  ggsave(paste0("02realization", i, ".pdf"),
+         plot = figc_i, path = fig_path,
+         width = w, height = h, units = "cm"
+  )
+}
 
 
 
+## 2 d) 
+#make 6 realizations from posterior
+#loop through the grid to draw samples
+result2d <- matrix(NA, nrow=n, ncol=nsim)
+for (i in 1:n) {
+  unobs <- rpois(n=nsim, lambda = (1-alpha$alpha[i])*lambda_hat*area)
+  grid_i_count <- unobs+d$N_obs[i]
+  result2d[i,]<- grid_i_count
+}
+
+
+plot2d <- function(observations,filename="NONE", save=FALSE){
+  df2d <- data.frame(x=d$x, y=d$y, N_obs = observations)
+  fig2di <- ggplot(data=df2d, aes(x=x, y=y, color=as.factor(N_obs))) +
+    geom_point(size=0.75) +
+    scale_colour_manual(values = cbPalette) +
+    labs(color="Tree count")+
+    theme_minimal()
+  if (save==TRUE){
+    ggsave(filename=filename,
+           plot = fig2di, path = fig_path,
+           width = w, height = h, units = "cm")
+  }  
+}
+
+for (i in 1:nsim){
+  plot2d(result2d[,i], filename=paste0("posterior",i,".pdf"), save=TRUE)
+}
 
