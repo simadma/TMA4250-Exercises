@@ -11,19 +11,7 @@ h <- 6  # cm
 library(ggplot2)
 library(dplyr)
 
-# plot2d <- function(treecount,filename="NONE", save=FALSE){
-#   df2d <- data.frame(x=d$x, y=d$y, N_obs = treecount)
-#   fig2di <- ggplot(data=df2d, aes(x=x, y=y, color=as.factor(N_obs))) +
-#     geom_point(size=0.75) +
-#     scale_colour_manual(values = cbPalette) +
-#     labs(color="Tree count")+
-#     theme_minimal()
-#   if (save==TRUE){
-#     ggsave(filename=filename,
-#            plot = fig2di, path = fig_path,
-#            width = w, height = h, units = "cm")
-#   }  
-# }
+
 
 eventloc_gridnode <- function(x,y,N_obs) {
   x_loc <- runif(N_obs, min=x-5, max=x+5)
@@ -69,6 +57,9 @@ plot_eventloc <- function(eventlocs) {
 
 }
 
+##########################################################################################
+#                                 Subproblem a)                                          #
+##########################################################################################
 
 
 #PATHS FOR DATASET
@@ -103,7 +94,10 @@ ggsave("probpinetrees.pdf",
        width = w, height = h, units = "cm"
 )
 
-#c) Estimation of lambda
+##########################################################################################
+#                                 Subproblem c)                                          #
+##########################################################################################
+
 area <- 100 #m^2
 
 lambda_hat <- sum(d$N_obs)/(area*sum(alpha$alpha))
@@ -134,7 +128,10 @@ h2 <- 6*2  # cm
 ggsave(filename="02priors.pdf", plot=fig2c, path=fig_path, height = h2, width=w2, units = "cm")
 
 
-## 2 d) 
+##########################################################################################
+#                                 Subproblem d)                                          #
+##########################################################################################
+
 #make 6 realizations from posterior
 #loop through the grid to draw samples
 posterior <- matrix(NA, nrow=n, ncol=nsim)
@@ -168,7 +165,10 @@ ggsave(filename="02posteriors.pdf", plot=fig2d, path=fig_path, height = h2, widt
 
 
 
-#2 e
+##########################################################################################
+#                                 Subproblem e)                                          #
+##########################################################################################
+
 #Simulate 100 realizations of the discretized event-count model, both for
 #the prior and the posterior models
 
