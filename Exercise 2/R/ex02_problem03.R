@@ -1,4 +1,12 @@
+#Exercise 2
+#Authors: Mads Adrian Simonsen and Karina Lilleborge
+#Date: 03-23-21
+
+#libraries
 source("./Exercise 2/R/utils.R")
+##########################################################################################
+#                                     PROBLEM 3                                          #
+##########################################################################################
 
 ## Read data
 # California Redwoods Point Pattern
@@ -45,10 +53,12 @@ level <- 0.1
 predint <- pred_interval(L_sim, level)
 lab <- sprintf("%.2f-interval", 1 - level)
 tib <- with(predint, cbind(L(redwood), lower = lower, upper = upper))
-ggplot(tib, aes(x, y)) +
+p1 <- ggplot(tib, aes(x, y)) +
   geom_ribbon(aes(ymin = lower, ymax = upper, fill = lab), alpha = 0.2) +
   geom_line(aes(color = "Empirical L-function")) +
-  coord_fixed() +
+  coord_fixed(
+    xlim=c(0, .5), ylim=c(0, .5)
+  ) +
   labs(x = "t", y = "L(t)", color = "", fill = "") +
   scale_color_manual(values = "blue") +
   scale_fill_manual(values = "black") +
@@ -56,26 +66,93 @@ ggplot(tib, aes(x, y)) +
          color = guide_legend(order = 1)) +
   theme_bw() +
   theme(
-    legend.position   = c(.38, .87),
     legend.margin = margin(),
     legend.spacing.y = unit(0, "mm"),
     legend.background = element_blank()
   )
 
+# w <- 7 + 4  # cm
+# h <- 7  # cm
+# ggsave("Neuman_Scott_L.pdf",
+#   plot = p1, path = fig_path,
+#   width = w, height = h, units = "cm"
+# )
+
 
 ## Plot
 # Simulated point pattern
-lambda_M = 6.5
-lambda_C = nrow(redwood)/lambda_M
-sigma_c = .08
-set.seed(3)
-ggplot(sequential_sim_NS(lambda_M, lambda_C, sigma_c), aes(x, y, color = family)) +
+set.seed(53)
+p2 <- ggplot(sequential_sim_NS(lambda_M, lambda_C, sigma_c), aes(x, y, color = family)) +
   geom_point() +
   coord_fixed(
     xlim = c(0, 1),
     ylim = c(0, 1)
   ) +
-  theme_bw()
+  theme_bw() +
+  theme(
+    legend.position = "top",
+    legend.margin = margin(),
+    legend.spacing.x = unit(0, "mm"),
+    legend.spacing.y = unit(0, "mm"),
+    legend.background = element_blank()
+  ) +
+  guides(color = guide_legend(nrow = 2))
+
+
+p3 <- ggplot(sequential_sim_NS(lambda_M, lambda_C, sigma_c), aes(x, y, color = family)) +
+  geom_point() +
+  coord_fixed(
+    xlim = c(0, 1),
+    ylim = c(0, 1)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "top",
+    legend.margin = margin(),
+    legend.spacing.x = unit(0, "mm"),
+    legend.spacing.y = unit(0, "mm"),
+    legend.background = element_blank()
+  ) +
+  guides(color = guide_legend(nrow = 2))
+
+p4 <- ggplot(sequential_sim_NS(lambda_M, lambda_C, sigma_c), aes(x, y, color = family)) +
+  geom_point() +
+  coord_fixed(
+    xlim = c(0, 1),
+    ylim = c(0, 1)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "top",
+    legend.margin = margin(),
+    legend.spacing.x = unit(0, "mm"),
+    legend.spacing.y = unit(0, "mm"),
+    legend.background = element_blank()
+  ) +
+  guides(color = guide_legend(nrow = 2))
+
+p2
+p3
+p4
+
+# w <- 7  # cm
+# h <- 7 + 1  # cm
+# ggsave("Neuman_Scott_sim1.pdf",
+#   plot = p2, path = fig_path,
+#   width = w, height = h, units = "cm"
+# )
+# 
+# ggsave("Neuman_Scott_sim2.pdf",
+#        plot = p3, path = fig_path,
+#        width = w, height = h, units = "cm"
+# )
+# 
+# ggsave("Neuman_Scott_sim3.pdf",
+#        plot = p4, path = fig_path,
+#        width = w, height = h, units = "cm"
+# )
+
+
 
 # Redwoods Point pattern
 ggplot(redwood, aes(x, y)) +
@@ -85,6 +162,3 @@ ggplot(redwood, aes(x, y)) +
     ylim = c(0, 1)
   ) +
   theme_bw()
-
-plot_Lf(redwood)
-plot_Lf(X_D)
