@@ -36,7 +36,7 @@ plot_eventloc1 <- function(eventlocs) {
     geom_vline(xintercept = seq(0,300, 10), color="black", alpha = 0.1, size=0.1) +
     geom_hline(yintercept = seq(0,300, 10), color="black", alpha = 0.1, size=0.1) +
     geom_point(size=0.5) +
-    coord_fixed() +
+    coord_fixed(xlim = c(0,300), ylim = c(0,300)) +
     theme_minimal() +
     labs(color="") + 
     theme(legend.position = "none")
@@ -75,6 +75,9 @@ fig1
 #Plot of the observation probability
 fig2 <- ggplot(data=alpha) +
   geom_tile(aes(x=x, y=y, fill=alpha))+
+  coord_fixed(
+    xlim=c(0, 300), ylim=c(0, 300)
+  ) +
   theme_minimal()
 #  theme(legend.position = "top")
 
@@ -146,7 +149,7 @@ ggsave(filename="02priors.pdf",
 posterior <- matrix(NA, nrow=n, ncol=nsim)
 for (i in 1:n) {
   unobs <- rpois(n=nsim, lambda = (1-alpha$alpha[i])*lambda_hat*area)
-  grid_i_count <- unobs#+d$N_obs[i]
+  grid_i_count <- unobs
   posterior[i,]<- grid_i_count
 }
 
@@ -219,6 +222,9 @@ mprior <- ggplot(data=df.prior) +
                        midpoint=mean(rng),    #same midpoint for plots (mean of the range)
                        breaks=seq(-100,100,4), #breaks in the scale bar
                        limits=c(floor(rng[1]), ceiling(rng[2]))) + #same limits for plots
+  coord_fixed(
+    xlim=c(0, 300), ylim=c(0, 300)
+  ) +
   labs(title="Mean tree count for the prior")+
   theme_minimal()
 
@@ -228,6 +234,9 @@ mposterior <- ggplot(data=df.posterior) +
                        midpoint=mean(rng),    #same midpoint for plots (mean of the range)
                        breaks=seq(-100,100,4), #breaks in the scale bar
                        limits=c(floor(rng[1]), ceiling(rng[2])))+ #same limits for plots
+  coord_fixed(
+    xlim=c(0, 300), ylim=c(0, 300)
+  ) +
   labs(title="Mean tree count for the posterior")+
   theme_minimal()
 
@@ -245,3 +254,4 @@ ggsave("02eposterior100.pdf",
        plot = mposterior, path = fig_path,
        width = w, height = h, units = "cm"
 )
+
