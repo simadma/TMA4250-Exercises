@@ -51,7 +51,9 @@ phi <- function(tau, tau_0, phi_0, phi_1) {
 }
 
 iterative_sim_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 1000) {
+  accept <- 0
   X_D <- matrix(runif(2*k), nrow = k, dimnames = list(NULL, c("x", "y")))
+  
   for (i in 1:n_iter) {
     u <- sample(k, 1) # sample index
     x_p <- runif(2)   # proposal
@@ -63,8 +65,10 @@ iterative_sim_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 1000) {
     alpha <- min(1, exp(-exponent))
     if (runif(1) < alpha) {
       X_D[u, ] <- x_p
+      accept <- accept + 1
     }
   }
+  print(sprintf("Acceptance percentage: %.2f%%", accept/(n_iter/100)))
   as_tibble(X_D)
 }
 
@@ -90,7 +94,6 @@ sim_multiple_Strauss <- function(k, tau_0, phi_0, phi_1, nsim=100) {
 }
 
 #Monte carlo test on the parameters
-#disse er ikke rett:/ er vanskelig å få den sånn flat på starten...
 tau_0 <- 0.07
 phi_0 <- 7000
 phi_1 <- 90
