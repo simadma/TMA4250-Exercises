@@ -15,9 +15,9 @@ L <- function(data, fs = .5, k = 100, dmin = FALSE) {
 }
 
 # Plots the empirical and theoretical L(t)
-plot_Lf <- function(data) {
+plot_Lf <- function(data, fs = .5, k = 100, dmin = FALSE) {
   lab <- c("L(t) = t", "Empirical L-function")
-  ggplot(L(data), aes(x, y)) +
+  ggplot(L(data, fs, k, dmin), aes(x, y)) +
     geom_function(fun=function(x) x, aes(color = lab[1], linetype = lab[1])) +
     geom_line(aes(color = lab[2], linetype = lab[2])) +
     scale_color_manual(values = c("blue", "black")) +
