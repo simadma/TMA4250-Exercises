@@ -69,7 +69,7 @@ iterative_sim_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 1000) {
 }
 
 
-test <- iterative_sim_Strauss(nrow(cells), tau_0 = 0.02, phi_0 = 7000, phi_1 = 9)
+test <- iterative_sim_Strauss(nrow(cells), tau_0 = 0.07, phi_0 = 7000, phi_1 = 50)
 
 test %>% 
   ggplot(aes(x, y)) +
@@ -91,9 +91,9 @@ sim_multiple_Strauss <- function(k, tau_0, phi_0, phi_1, nsim=100) {
 
 #Monte carlo test on the parameters
 #disse er ikke rett:/ er vanskelig å få den sånn flat på starten...
-tau_0 <- 0.02
+tau_0 <- 0.07
 phi_0 <- 7000
-phi_1 <- 9
+phi_1 <- 90
 set.seed(99)
 L_sim <- sim_multiple_Strauss(nrow(cells), tau_0 = tau_0, phi_0 = phi_0, phi_1 = phi_1, nsim=10) #100 tar kjeeempelang tid
 level <- 0.1
