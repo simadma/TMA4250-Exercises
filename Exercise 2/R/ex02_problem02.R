@@ -11,6 +11,8 @@ h <- 6  # cm
 library(ggplot2)
 library(dplyr)
 
+
+#Functions to create event-location plots from event count data
 #generates uniformly random locations for N_obs pine trees
 eventloc_gridnode <- function(x,y,N_obs) {
   x_loc <- runif(N_obs, min=x-5, max=x+5)
@@ -48,7 +50,7 @@ plot_eventloc <- function(eventlocs) {
     geom_vline(xintercept = seq(0,300, 10), color="black", alpha = 0.1, size=0.1) +
     geom_hline(yintercept = seq(0,300, 10), color="black", alpha = 0.1, size=0.1) +
     geom_point(size=0.5, aes(color=point)) +
-    coord_fixed() +
+    coord_fixed(xlim = c(0,300), ylim = c(0,300)) +
     theme_minimal() +
     labs(color="") + 
     theme(legend.position = "top")
@@ -83,7 +85,7 @@ fig2 <- ggplot(data=alpha) +
 
 fig2
 
-#Saving figures for problem 1a
+#Saving figures for problem 2a
 ggsave("obspinetrees.pdf",
   plot = fig1, path = fig_path,
   width = w, height = h, units = "cm"
@@ -114,26 +116,24 @@ for (i in 1:nsim){
   priors[i,] <- rpois(n=n, lambda=lambda_hat*area)
 }
 
-
-#event locations for all realizations from prior
+#Event locations for all realizations from prior
 prior_dfs <- list()
 for (i in 1:nsim){
   df_i <- data.frame(x=d$x, y=d$y, N_obs = priors[i,])
-  eventlocs_i <- eventloc(df_i)
-  prior_dfs[[i]] <- eventlocs_i
+  prior_dfs[[i]] <- eventloc(df_i)
 }
 
 #Visualization of the locations
 a <- bind_rows(prior_dfs, .id="realization")
 fig2c <- plot_eventloc1(a) + facet_wrap(~realization, nrow=2)
 
-#to see figure
+#To see figure
 print(fig2c)
 
-#fig dimensions
+#Figure dimensions for subplots
 w2 <- 6*2  # cm
 h2 <- 6*2  # cm
-#to save the figure
+#To save the figure for problem 2c
 ggsave(filename="02priors.pdf", 
        plot=fig2c, path=fig_path, 
        height = h2, width=w2, 
@@ -144,8 +144,8 @@ ggsave(filename="02priors.pdf",
 #                                 Subproblem d)                                          #
 ##########################################################################################
 
-#make 6 realizations from posterior
-#loop through the grid to draw samples
+#Make 6 realizations from posterior
+#Loop through the grid to draw samples
 posterior <- matrix(NA, nrow=n, ncol=nsim)
 for (i in 1:n) {
   unobs <- rpois(n=nsim, lambda = (1-alpha$alpha[i])*lambda_hat*area)
@@ -153,7 +153,7 @@ for (i in 1:n) {
   posterior[i,]<- grid_i_count
 }
 
-#event locations for all realizations from posterior
+#Event locations for all realizations from posterior
 posterior_dfs <- list()
 for (i in 1:nsim){
   df_i <- data.frame(x=d$x, y=d$y, N_obs = posterior[,i])
@@ -169,7 +169,7 @@ fig2d <- plot_eventloc(b) + facet_wrap(~realization, nrow=2)
 #To see the figure:
 print(fig2d)
 
-# Figure size
+# Figure size for subplotting
 w2 <- 6*2  # cm
 h2 <- 6*2  # cm
 
@@ -189,7 +189,7 @@ ggsave(filename="02posteriors.pdf",
 #the prior and the posterior models
 #Prior
 prior100<-matrix(NA, nrow=100, ncol=n)
-#loop over the number of simulations (stationary Poisson random field)
+#Loop over the number of simulations (stationary Poisson random field)
 for (i in 1:100){
   prior100[i,] <- rpois(n=n, lambda=lambda_hat*area)
 }
@@ -198,7 +198,7 @@ mean_prior <- apply(prior100, MARGIN = 2, mean)
 
 #Posterior
 posterior100<- matrix(NA, nrow=100, ncol=n)
-#loop over all grid nodes (non-stationary Poisson field)
+#Loop over all grid nodes (non-stationary Poisson field)
 for (i in 1:n) {
   unobs <- rpois(n=100, lambda = (1-alpha$alpha[i])*lambda_hat*area)
   grid_i_count <- unobs+d$N_obs[i]
@@ -211,11 +211,12 @@ mean_posterior <- apply(posterior100, MARGIN = 2, mean)
 #For plotting
 rng = range(c((mean_prior), (mean_posterior))) #a range to have the same min and max for both plots
 
-#dataframes for plotting
+#Dataframes for plotting
 df.prior <- data.frame(x=d$x, y=d$y, mean=mean_prior)
 df.posterior <- data.frame(x=d$x, y=d$y, mean=mean_posterior)
 
-#figures
+#Figures
+#Mean tree count for the prior
 mprior <- ggplot(data=df.prior) +
   geom_tile(aes(x=x, y=y, fill=mean))+
   scale_fill_gradient2(low="blue", mid="cyan", high="lightblue", #colors in the scale
@@ -225,9 +226,9 @@ mprior <- ggplot(data=df.prior) +
   coord_fixed(
     xlim=c(0, 300), ylim=c(0, 300)
   ) +
-  labs(title="Mean tree count for the prior")+
   theme_minimal()
 
+#Mean tree count for the posterior
 mposterior <- ggplot(data=df.posterior) +
   geom_tile(aes(x=x, y=y, fill=mean))+
   scale_fill_gradient2(low="blue", mid="cyan", high="lightblue", #colors in the scale
@@ -237,7 +238,6 @@ mposterior <- ggplot(data=df.posterior) +
   coord_fixed(
     xlim=c(0, 300), ylim=c(0, 300)
   ) +
-  labs(title="Mean tree count for the posterior")+
   theme_minimal()
 
 #To see plots:
