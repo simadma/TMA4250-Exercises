@@ -19,29 +19,6 @@ cells <- read_table(paste0(data_path, "cells.dat"), col_names = c("x", "y"))
 #                                 Subproblem a)                                          #
 ##########################################################################################
 
-# Biological Cells point pattern
-cells %>% ggplot(aes(x, y)) +
-  geom_point() +
-  coord_fixed(
-    xlim = c(0, 1),
-    ylim = c(0, 1)
-  ) +
-  theme_bw()
-
-plot_Lf(cells)
-set.seed(10)
-g <- Strauss(42,c=0.04, r = 0.10)
-plot_Lf(g)
-data.frame(x=g$x, y=g$y) %>% 
-  ggplot(aes(x, y)) +
-  geom_point() +
-  coord_fixed(
-    xlim = c(0, 1),
-    ylim = c(0, 1)
-  ) +
-  theme_bw()
-
-
 phi <- function(tau, tau_0, phi_0, phi_1) {
   tau <- norm(tau, type = "2")
   if_else(tau <= tau_0,
@@ -58,8 +35,12 @@ iterative_sim_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 1000) {
     x_p <- runif(2)   # proposal
     exponent <- 0
     for (j in 1:k) {
-      exponent <- exponent + (phi(x_p - X_D[j, ], tau_0, phi_0, phi_1)
-                              - phi(X_D[u, ] - X_D[j, ], tau_0, phi_0, phi_1))
+      if (j != u) {  # For all j=1,2,..,k except u
+        shift <- rep(x_p, each = k) - 0.5
+        X_S <- (X_D - shift) %% 1 + shift  # Shifted domain where proposal lies in center
+        exponent <- exponent + (phi(x_p - X_S[j, ], tau_0, phi_0, phi_1)
+                                - phi(X_S[u, ] - X_S[j, ], tau_0, phi_0, phi_1))
+      }
     }
     alpha <- min(1, exp(-exponent))
     if (runif(1) < alpha) {
@@ -71,34 +52,22 @@ iterative_sim_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 1000) {
   as_tibble(X_D)
 }
 
-set.seed(3)
-test <- iterative_sim_Strauss(nrow(cells), tau_0 = 0.1, phi_0 = 7000, phi_1 = 9000, n_iter = 10000)
-L(test, dmin = TRUE)
-test %>% 
-  ggplot(aes(x, y)) +
-  geom_point() +
-  coord_fixed(
-    xlim = c(0, 1),
-    ylim = c(0, 1)
-  ) +
-  theme_bw()
-
 #Monte carlo test on the parameters with the L-function
-sim_multiple_Strauss <- function(k, tau_0, phi_0, phi_1, nsim=100) {
+sim_multiple_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 500, nsim = 20) {
   result <- matrix(0, nrow = nsim, ncol = 100) #hvorfor 100 kolonner?
   for (i in 1:nsim){
-    result[i, ] <- L(iterative_sim_Strauss(k, tau_0, phi_0, phi_1))$y
+    result[i, ] <- L(iterative_sim_Strauss(k, tau_0, phi_0, phi_1, n_iter))$y
   }
   result
 }
 
 #Monte carlo test on the parameters
-#disse er ikke rett:/ er vanskelig å få den sånn flat på starten...
-tau_0 <- 0.02
-phi_0 <- 7000
-phi_1 <- 9
-set.seed(99)
-L_sim <- sim_multiple_Strauss(nrow(cells), tau_0 = tau_0, phi_0 = phi_0, phi_1 = phi_1, nsim=10) #100 tar kjeeempelang tid
+set.seed(31)
+tau_0 <- 0.1
+phi_0 <- 455
+phi_1 <- 820
+n_iter <- 500
+L_sim <- sim_multiple_Strauss(nrow(cells), tau_0, phi_0, phi_1, n_iter, nsim=20) #100 tar kjeeempelang tid
 level <- 0.1
 predint <- pred_interval(L_sim, level)
 lab <- sprintf("%.2f-interval", 1 - level)
@@ -121,3 +90,62 @@ p1 <- ggplot(tib, aes(x, y)) +
     legend.background = element_blank()
   )
 p1
+
+# w <- 7 + 4  # cm
+# h <- 7  # cm
+# ggsave("Strauss_L.pdf",
+#   plot = p1, path = fig_path,
+#   width = w, height = h, units = "cm"
+# )
+
+
+## Plot
+# Simulated point pattern
+set.seed(54)
+p2 <- iterative_sim_Strauss(nrow(cells), tau_0, phi_0, phi_1, n_iter) %>% 
+  ggplot(aes(x, y)) +
+  geom_point() +
+  coord_fixed(
+    xlim = c(0, 1),
+    ylim = c(0, 1)
+  ) +
+  theme_bw()
+
+p3 <- iterative_sim_Strauss(nrow(cells), tau_0, phi_0, phi_1, n_iter) %>% 
+  ggplot(aes(x, y)) +
+  geom_point() +
+  coord_fixed(
+    xlim = c(0, 1),
+    ylim = c(0, 1)
+  ) +
+  theme_bw()
+
+p4 <- iterative_sim_Strauss(nrow(cells), tau_0, phi_0, phi_1, n_iter) %>% 
+  ggplot(aes(x, y)) +
+  geom_point() +
+  coord_fixed(
+    xlim = c(0, 1),
+    ylim = c(0, 1)
+  ) +
+  theme_bw()
+
+p2
+p3
+p4
+
+# w <- 7  # cm
+# h <- 7  # cm
+# ggsave("Strauss_sim1.pdf",
+#   plot = p2, path = fig_path,
+#   width = w, height = h, units = "cm"
+# )
+# 
+# ggsave("Strauss_sim2.pdf",
+#        plot = p3, path = fig_path,
+#        width = w, height = h, units = "cm"
+# )
+# 
+# ggsave("Strauss_sim3.pdf",
+#        plot = p4, path = fig_path,
+#        width = w, height = h, units = "cm"
+# )
