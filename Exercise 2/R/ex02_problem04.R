@@ -30,6 +30,7 @@ phi <- function(tau, tau_0, phi_0, phi_1) {
 iterative_sim_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 1000) {
   accept <- 0
   X_D <- matrix(runif(2*k), nrow = k, dimnames = list(NULL, c("x", "y")))
+  
   for (i in 1:n_iter) {
     u <- sample(k, 1) # sample index
     x_p <- runif(2)   # proposal
@@ -52,6 +53,20 @@ iterative_sim_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 1000) {
   as_tibble(X_D)
 }
 
+
+test <- iterative_sim_Strauss(nrow(cells), tau_0 = 0.07, phi_0 = 7000, phi_1 = 50)
+
+test %>% 
+  ggplot(aes(x, y)) +
+  geom_point() +
+  coord_fixed(
+    xlim = c(0, 1),
+    ylim = c(0, 1)
+  ) +
+  theme_bw()
+
+
+
 #Monte carlo test on the parameters with the L-function
 sim_multiple_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 500, nsim = 20) {
   result <- matrix(0, nrow = nsim, ncol = 100) #hvorfor 100 kolonner?
@@ -61,13 +76,13 @@ sim_multiple_Strauss <- function(k, tau_0, phi_0, phi_1, n_iter = 500, nsim = 20
   result
 }
 
-#Monte carlo test on the parameters
+
 set.seed(31)
 tau_0 <- 0.1
 phi_0 <- 455
 phi_1 <- 820
 n_iter <- 500
-L_sim <- sim_multiple_Strauss(nrow(cells), tau_0, phi_0, phi_1, n_iter, nsim=20) #100 tar kjeeempelang tid
+L_sim <- sim_multiple_Strauss(nrow(cells), tau_0, phi_0, phi_1, n_iter, nsim=20) 
 level <- 0.1
 predint <- pred_interval(L_sim, level)
 lab <- sprintf("%.2f-interval", 1 - level)
