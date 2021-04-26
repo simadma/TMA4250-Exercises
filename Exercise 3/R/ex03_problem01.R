@@ -18,6 +18,10 @@ complit <- as.matrix(read.table(paste0(data_path, "complit.dat")))
 dimnames(complit) <- NULL
 n_seis <- as.integer(sqrt(length(seismic)))
 
+##########################################################################################
+##                               Display observations                                   ##
+##########################################################################################
+
 # black and white color palette
 bw <- gray.colors(256, start = 0, end = 1)
 zlim <- c(-0.08, 1.08)
@@ -32,7 +36,7 @@ par(mar = c(2, 2, 0, 2) + 0.5)
 image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(seismic, nrow=n_seis),
            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
 # contour(x = 1:n_seis, y = 1:n_seis, z = matrix(seismic, nrow=n_seis),
-#         nlevels = 3, drawlabels = FALSE, add = TRUE)
+#        nlevels = 3, drawlabels = FALSE, add = TRUE)
 # dev.off()
 
 image(complit, col=bw, asp=1)
@@ -53,8 +57,9 @@ sigma_sq <- 0.06^2
 # "success" probability p(l_i = 1 | d), i = 1,...,n
 theta <- 1 / (1 + exp(((seismic - mu_1)^2 - (seismic - mu_0)^2) / (2*sigma_sq)))
 nsim <- 6
-posterior_unif_prior <- matrix(rbinom(n = nsim*length(theta), size = 1, prob = theta),
+posterior_unif_prior <- matrix(1*(runif(nsim*length(theta)) < theta),
                                nrow = nsim, byrow = TRUE)
+
 # Plot
 # pdf(
 #   file = paste0(fig_path, "post_real_unif_prior.pdf"),
@@ -126,3 +131,58 @@ image(x = 1:n_seis, y = 1:n_seis, z = matrix(mmap, nrow=n_seis),
 ##                                                                                      ##
 ##########################################################################################
 
+##########################################################################################
+##                          Observations from train data                                ##
+##########################################################################################
+
+n_comp <- nrow(complit)
+# Plot
+# pdf(
+#   file = paste0(fig_path, "obs_train.pdf"),
+#   height = 3.592,
+#   width = 3.992
+# )
+par(mar = c(2, 2, 0, 2) + 0.5)
+image(x = 1:n_comp, y = 1:n_comp, z = complit,
+      col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+# dev.off()
+
+##########################################################################################
+##            Compute Maximum Marginal pseudo-Likelihood (MMpL) estimate                ##
+##########################################################################################
+MMpL <- function(beta, l) {
+  m <- nrow(l)
+  value <- 0
+  for (k_row in 1:m) {
+    for (k_col in 1:m) {
+      l_k <- l[k_row, k_col]
+      # first term
+      first_term <- 0
+      if (k_row > 1) first_term <- first_term + (l[k_row - 1, k_col] == l_k)  # v clique
+      if (k_row < m) first_term <- first_term + (l[k_row + 1, k_col] == l_k)  # v clique
+      if (k_col > 1) first_term <- first_term + (l[k_row, k_col - 1] == l_k)  # h clique
+      if (k_col < m) first_term <- first_term + (l[k_row, k_col + 1] == l_k)  # h clique
+      value <- value + log(beta)*first_term
+      
+      # second term
+      second_term <- 0
+      for (l_prime in 0:1) {
+        temp <- 0
+        if (k_row > 1) temp <- temp + (l[k_row - 1, k_col] == l_prime)  # v clique
+        if (k_row < m) temp <- temp + (l[k_row + 1, k_col] == l_prime)  # v clique
+        if (k_col > 1) temp <- temp + (l[k_row, k_col - 1] == l_prime)  # h clique
+        if (k_col < m) temp <- temp + (l[k_row, k_col + 1] == l_prime)  # h clique
+        second_term <- second_term + beta^temp
+      }
+      value <- value - log(second_term)
+    }
+  }
+  value
+}
+
+beta_hat <- optimize(f = MMpL, interval = c(1, 100), l = complit, maximum = TRUE)$maximum
+beta_hat
+
+##########################################################################################
+##                                Realizations                                          ##
+##########################################################################################
