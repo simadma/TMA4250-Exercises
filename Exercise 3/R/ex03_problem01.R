@@ -191,10 +191,18 @@ prop_sand <- function(l) {
   sum(l)/length(l)
 }
 
-markovpost <- function(i, l, d) {
-  alpha <- runif(1)
-  i <- sample(1:n, 1)
-  #l_i_prop from markov posterior
+neighboorhood <- function(k, l, n, ncols){
+  #if l is a vector
+  if (k %in% seq(1, n, ncols)) l_W<-l[k + (ncols - 1)]
+  else l_W <- l[k-1]
+  if (k %in% seq(1,length(l), ncols)) l_E<-l[1 - (ncols - 1)]
+  else l_E <- l[k+1]
+  if (k %in% 1:ncols) l_N <- l[]
+  else l_N <- l[k-ncols]
+  if (k %in% (length(l)))
+  
+  l_S <- l[k+ncols]
+  return(l_E+l_W+l_N+l_S)
 }
 
 gibbsposterior <- function(beta, n, max_iter){
