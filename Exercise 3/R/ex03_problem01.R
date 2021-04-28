@@ -186,3 +186,29 @@ beta_hat
 ##########################################################################################
 ##                                Realizations                                          ##
 ##########################################################################################
+
+prop_sand <- function(l) {
+  sum(l)/length(l)
+}
+
+markovpost <- function(i, l, d) {
+  alpha <- runif(1)
+  i <- sample(1:n, 1)
+  #l_i_prop from markov posterior
+}
+
+gibbsposterior <- function(beta, n, max_iter){
+  samples <- matrix(NA, nrow=max_iter, ncol=n)
+  #define g(l'|l)
+  
+  
+  #initiate l^0 st p(l^0|d)>0
+  
+  for (iter in 1:max_iter){
+    #l^j drawn from g(l|l^{j-1}) (block gibbs)
+    
+    #check convergence with proportion of sand
+  }
+  return (1) #return all samples of l
+}
+
