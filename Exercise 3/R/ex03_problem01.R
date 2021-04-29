@@ -191,32 +191,49 @@ prop_sand <- function(l) {
   sum(l)/length(l)
 }
 
-neighboorhood <- function(k, l, n, ncols){
+neighborhood <- function(k, l, n, ncols){
   #if l is a vector
   if (k %in% seq(1, n, ncols)) l_W<-l[k + (ncols - 1)]
   else l_W <- l[k-1]
   if (k %in% seq(1,length(l), ncols)) l_E<-l[1 - (ncols - 1)]
   else l_E <- l[k+1]
-  if (k %in% 1:ncols) l_N <- l[]
+  if (k %in% 1:ncols) l_N <- l[k + (ncols-1)*ncols]
   else l_N <- l[k-ncols]
-  if (k %in% (length(l)))
-  
-  l_S <- l[k+ncols]
+  if (k %in% (length(l)-(ncols-1)):length(l)) l_S <- l[k - (ncols-1)*ncols]
+  else l_S <- l[k+ncols]
   return(l_E+l_W+l_N+l_S)
 }
 
-gibbsposterior <- function(beta, n, max_iter){
+successprob <- function(neighbors, beta, d_k, mu_0, mu_1, sigma_sq){
+  return ((dnorm(d_k, mean=mu_1, sd=sqrt(sigma_sq)) *beta^(neighbors)) /
+            (dnorm(d_k, mean=mu_0, sd=sqrt(sigma_sq))* beta^(4-neighbors) + 
+               dnorm(d_k, mean=mu_1, sd=sqrt(sigma_sq))* beta^(neighbors)))
+}
+
+g <- function(l, d, beta, mu_0, mu_1, sigma_sq){
+  i <- sample(1:length(l), 1)
+  neighbors <- neighborhood(k=i, l, length(l), as.integer(sqrt(length(l))))
+  lambda_i <- successprob(neighbors = neighbors, beta=beta, d[i], mu_0, mu_1, sigma_sq)
+  l_i <- rbinom(1,1,lambda_i)
+  l[i] <- l_i
+  return (l)
+}
+
+gibbsposterior <- function(l_0, d, beta, max_iter){
+  n <- length(l_0)
   samples <- matrix(NA, nrow=max_iter, ncol=n)
+  convergence <- matrix(Na, nrow=max_iter)
   #define g(l'|l)
-  
-  
-  #initiate l^0 st p(l^0|d)>0
-  
+  #bernoulli with successprob found with successprob g()
+  l <- l_0
   for (iter in 1:max_iter){
     #l^j drawn from g(l|l^{j-1}) (block gibbs)
-    
+    l <- g(l, d, beta, mu_0, mu_1, sigma_sq)
+    samples[iter,] <- l
     #check convergence with proportion of sand
+    sandprob <- prop_sand(l)
+    convergence[iter] <- sandprop
   }
-  return (1) #return all samples of l
+  return (list(samples, convergence)) #return all samples of l and the sandproportion
 }
 
