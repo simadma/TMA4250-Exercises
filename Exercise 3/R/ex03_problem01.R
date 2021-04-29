@@ -195,14 +195,20 @@ prop_sand <- function(l) {
 #function to find the sum of I(l_i=1) for i in the neighborhood of k
 neighborhood <- function(k, l, n, ncols){
   #if l is a vector
+  
+  #check if k is such that west point is outside (left column in matrix)
   if (k %in% seq(1, n, ncols)) l_W<-l[k + (ncols - 1)]
   else l_W <- l[k-1]
-  if (k %in% seq(1,length(l), ncols)) l_E<-l[1 - (ncols - 1)]
+  #check if k is such that east point is outside (right column in matrix)
+  if (k %in% seq(1,n, ncols)) l_E<-l[k - (ncols - 1)]
   else l_E <- l[k+1]
+  #check if k is such that north point is outside (upper row in matrix)
   if (k %in% 1:ncols) l_N <- l[k + (ncols-1)*ncols]
   else l_N <- l[k-ncols]
-  if (k %in% (length(l)-(ncols-1)):length(l)) l_S <- l[k - (ncols-1)*ncols]
+  #check if k is such that south point is outside (lower row in matrix)
+  if (k %in% (n-(ncols-1)):n) l_S <- l[k - (ncols-1)*ncols]
   else l_S <- l[k+ncols]
+  
   return(l_E+l_W+l_N+l_S)
 }
 
@@ -232,7 +238,7 @@ gibbsposterior <- function(l_0, d, beta, max_iter){
   l <- l_0
   for (iter in 1:max_iter){
     #l^j drawn from g(l|l^{j-1}) (block gibbs)
-    l <- g(l, d, beta, mu_0, mu_1, sigma_sq)
+    l <- g(l, d, beta)
     samples[iter,] <- l
     #check convergence with proportion of sand
     sandprob <- prop_sand(l)
@@ -242,7 +248,7 @@ gibbsposterior <- function(l_0, d, beta, max_iter){
 }
 
 l_0 <- mmap #initial guess(?)
-result <- gibbsposterior(l_0, seismic, beta_hat, 1000)
+result <- gibbsposterior(l_0, seismic, beta_hat, 8000)
 
 
 plot(result[[2]])
