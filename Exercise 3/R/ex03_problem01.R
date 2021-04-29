@@ -187,10 +187,12 @@ beta_hat
 ##                                Realizations                                          ##
 ##########################################################################################
 
+#function to check proportion of sand
 prop_sand <- function(l) {
   sum(l)/length(l)
 }
 
+#function to find the sum of I(l_i=1) for i in the neighborhood of k
 neighborhood <- function(k, l, n, ncols){
   #if l is a vector
   if (k %in% seq(1, n, ncols)) l_W<-l[k + (ncols - 1)]
@@ -204,27 +206,29 @@ neighborhood <- function(k, l, n, ncols){
   return(l_E+l_W+l_N+l_S)
 }
 
-successprob <- function(neighbors, beta, d_k, mu_0, mu_1, sigma_sq){
+
+#function to compute lambda_k (successprobability) for the bernoulli dist of l_i|d
+successprob <- function(neighbors, beta, d_k){
   return ((dnorm(d_k, mean=mu_1, sd=sqrt(sigma_sq)) *beta^(neighbors)) /
             (dnorm(d_k, mean=mu_0, sd=sqrt(sigma_sq))* beta^(4-neighbors) + 
                dnorm(d_k, mean=mu_1, sd=sqrt(sigma_sq))* beta^(neighbors)))
 }
 
-g <- function(l, d, beta, mu_0, mu_1, sigma_sq){
+#proposals from the bernoulli distribution with probability of success = lambda_k
+g <- function(l, d, beta){
   i <- sample(1:length(l), 1)
   neighbors <- neighborhood(k=i, l, length(l), as.integer(sqrt(length(l))))
-  lambda_i <- successprob(neighbors = neighbors, beta=beta, d[i], mu_0, mu_1, sigma_sq)
+  lambda_i <- successprob(neighbors = neighbors, beta=beta, d[i])
   l_i <- rbinom(1,1,lambda_i)
   l[i] <- l_i
   return (l)
 }
 
+#actual algorithm to perform gibbs sampling
 gibbsposterior <- function(l_0, d, beta, max_iter){
   n <- length(l_0)
   samples <- matrix(NA, nrow=max_iter, ncol=n)
-  convergence <- matrix(Na, nrow=max_iter)
-  #define g(l'|l)
-  #bernoulli with successprob found with successprob g()
+  convergence <- matrix(NA, nrow=max_iter)
   l <- l_0
   for (iter in 1:max_iter){
     #l^j drawn from g(l|l^{j-1}) (block gibbs)
@@ -232,8 +236,13 @@ gibbsposterior <- function(l_0, d, beta, max_iter){
     samples[iter,] <- l
     #check convergence with proportion of sand
     sandprob <- prop_sand(l)
-    convergence[iter] <- sandprop
+    convergence[iter] <- sandprob
   }
-  return (list(samples, convergence)) #return all samples of l and the sandproportion
+  return (list(samples, convergence)) #return all samples of l and the sand proportion
 }
 
+l_0 <- mmap #initial guess(?)
+result <- gibbsposterior(l_0, seismic, beta_hat, 1000)
+
+
+plot(result[[2]])
