@@ -262,7 +262,12 @@ gibbsposterior <- function(l_0, d, beta, max_iter){
 }
 
 l_0 <- mmap #initial guess(?)
-result <- gibbsposterior(l_0, seismic, beta_hat, length(l_0)*50)
+result <- gibbsposterior(l_0, seismic, 1.6, length(l_0)*50)
 
-proportion <- result[[2]]
-plot(proportion[,1])
+proportion <- result[[2]][,1]
+plot(1:50, proportion)
+
+distribution <- result[[1]]
+testdist <- distribution[49,]
+image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(testdist, nrow=n_seis),
+           col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
