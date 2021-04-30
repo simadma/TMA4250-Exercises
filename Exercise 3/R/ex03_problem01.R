@@ -150,6 +150,35 @@ image(x = 1:n_comp, y = 1:n_comp, z = complit,
 ##########################################################################################
 ##            Compute Maximum Marginal pseudo-Likelihood (MMpL) estimate                ##
 ##########################################################################################
+# MMpL <- function(beta, l) {
+#   m <- nrow(l)
+#   value <- 0
+#   for (k_row in 1:m) {
+#     for (k_col in 1:m) {
+#       l_k <- l[k_row, k_col]
+#       # first term
+#       first_term <- 0
+#       if (k_row > 1) first_term <- first_term + (l[k_row - 1, k_col] == l_k)  # v clique
+#       if (k_row < m) first_term <- first_term + (l[k_row + 1, k_col] == l_k)  # v clique
+#       if (k_col > 1) first_term <- first_term + (l[k_row, k_col - 1] == l_k)  # h clique
+#       if (k_col < m) first_term <- first_term + (l[k_row, k_col + 1] == l_k)  # h clique
+#       value <- value + log(beta)*first_term
+#       
+#       # second term
+#       second_term <- 0
+#       for (l_prime in 0:1) {
+#         temp <- 0
+#         if (k_row > 1) temp <- temp + (l[k_row - 1, k_col] == l_prime)  # v clique
+#         if (k_row < m) temp <- temp + (l[k_row + 1, k_col] == l_prime)  # v clique
+#         if (k_col > 1) temp <- temp + (l[k_row, k_col - 1] == l_prime)  # h clique
+#         if (k_col < m) temp <- temp + (l[k_row, k_col + 1] == l_prime)  # h clique
+#         second_term <- second_term + beta^temp
+#       }
+#       value <- value - log(second_term)
+#     }
+#   }
+#   value
+# }
 MMpL <- function(beta, l) {
   m <- nrow(l)
   value <- 0
@@ -157,21 +186,51 @@ MMpL <- function(beta, l) {
     for (k_col in 1:m) {
       l_k <- l[k_row, k_col]
       # first term
-      first_term <- 0
-      if (k_row > 1) first_term <- first_term + (l[k_row - 1, k_col] == l_k)  # v clique
-      if (k_row < m) first_term <- first_term + (l[k_row + 1, k_col] == l_k)  # v clique
-      if (k_col > 1) first_term <- first_term + (l[k_row, k_col - 1] == l_k)  # h clique
-      if (k_col < m) first_term <- first_term + (l[k_row, k_col + 1] == l_k)  # h clique
+      first_term <- ifelse(
+        test = k_row > 1,
+        yes  = (l[k_row - 1, k_col] == l_k),
+        no   = (l[m, k_col] == l_k)
+      ) +
+        ifelse(
+          test = k_row < m,
+          yes  = (l[k_row + 1, k_col] == l_k),
+          no   = (l[1, k_col] == l_k)
+        ) +
+        ifelse(
+          test = k_col > 1,
+          yes  = (l[k_row, k_col - 1] == l_k),
+          no   = (l[k_row, m] == l_k)
+        ) +
+        ifelse(
+          test = k_col < m,
+          yes  = (l[k_row, k_col + 1] == l_k),
+          no   = (l[k_row, 1] == l_k)
+        )
       value <- value + log(beta)*first_term
       
       # second term
       second_term <- 0
       for (l_prime in 0:1) {
-        temp <- 0
-        if (k_row > 1) temp <- temp + (l[k_row - 1, k_col] == l_prime)  # v clique
-        if (k_row < m) temp <- temp + (l[k_row + 1, k_col] == l_prime)  # v clique
-        if (k_col > 1) temp <- temp + (l[k_row, k_col - 1] == l_prime)  # h clique
-        if (k_col < m) temp <- temp + (l[k_row, k_col + 1] == l_prime)  # h clique
+        temp <- ifelse(
+          test = k_row > 1,
+          yes  = (l[k_row - 1, k_col] == l_prime),
+          no   = (l[m, k_col] == l_prime)
+        ) +
+          ifelse(
+            test = k_row < m,
+            yes  = (l[k_row + 1, k_col] == l_prime),
+            no   = (l[1, k_col] == l_prime)
+          ) +
+          ifelse(
+            test = k_col > 1,
+            yes  = (l[k_row, k_col - 1] == l_prime),
+            no   = (l[k_row, m] == l_prime)
+          ) +
+          ifelse(
+            test = k_col < m,
+            yes  = (l[k_row, k_col + 1] == l_prime),
+            no   = (l[k_row, 1] == l_prime)
+          )
         second_term <- second_term + beta^temp
       }
       value <- value - log(second_term)
@@ -261,14 +320,34 @@ gibbsposterior <- function(l_0, d, beta, max_iter){
   return (list(samples, convergence)) #return all samples of l and the sand proportion
 }
 
-l_0 <- mmap #initial guess(?)
-result <- gibbsposterior(l_0, seismic, beta_hat, length(l_0)*50)
+nsweeps <- 100
+l_0 <- sample(0:1, size = length(seismic), replace = TRUE) #initial guess(?)
+result <- gibbsposterior(l_0, seismic, beta_hat, length(l_0)*nsweeps)
 
 proportion <- result[[2]][,1]
-plot(1:50, proportion)
+par(mfrow = c(2, 3), mar = c(2, 2, 0, 0) + 0.5)
+plot(1:nsweeps, proportion, type="l")
 
 distribution <- result[[1]]
-testdist <- distribution[49,]
-mean_post <- apply(distribution[10:50,], MARGIN = 2, FUN = mean)
+mean_post <- apply(distribution[30:50,], MARGIN = 2, FUN = mean)
 image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(mean_post, nrow=n_seis),
            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+
+var_post <-apply(distribution[30:50,], MARGIN = 2, FUN = var)
+image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(var_post, nrow=n_seis),
+           col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+
+realizationindex <- sample(30:nsweeps, 3)
+realization1 <- distribution[realizationindex[1],]
+image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization1, nrow=n_seis),
+      col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+
+realization2 <- distribution[realizationindex[2],]
+image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization2, nrow=n_seis),
+      col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+
+
+realization3 <- distribution[realizationindex[3],]
+image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization3, nrow=n_seis),
+      col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+
