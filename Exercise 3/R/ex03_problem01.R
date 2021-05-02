@@ -243,7 +243,7 @@ beta_hat <- optimize(f = MMpL, interval = c(1, 100), l = complit, maximum = TRUE
 beta_hat
 
 ##########################################################################################
-##                                Realizations                                          ##
+##                                Markov RF prior                                       ##
 ##########################################################################################
 
 #function to check proportion of sand
@@ -369,7 +369,7 @@ legend("bottomright", legend = c("All sand", "All shale", "Uniform iid"), col = 
 
 
 ##########################################################################################
-##                 Six realizations of posterior with uniform prior                     ##
+##                 Six realizations of posterior with Markov RF prior                   ##
 ##########################################################################################
 
 realizationid <- sample(250:nsweeps, 2)
@@ -408,7 +408,7 @@ sample6 <- distributionr[realizationid[2],]
 
 
 ##########################################################################################
-##             Expectation and Variance of posterior with Markov prior                  ##
+##             Expectation and Variance of posterior with Markov RF prior               ##
 ##########################################################################################
 
 samples_combined <- rbind(distribution0[250:nsweeps,], rbind(distribution1[150:nsweeps,], distributionr[50:nsweeps,]))
@@ -442,7 +442,7 @@ var_post <- apply(samples_combined, MARGIN = 2, FUN = var)
 # dev.off()
 
 ##########################################################################################
-##                         MMAP of posterior with Markov prior                          ##
+##                         MMAP of posterior with Markov RF prior                       ##
 ##########################################################################################
 
 mu_critical2 <- 0.5
