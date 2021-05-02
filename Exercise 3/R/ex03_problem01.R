@@ -248,7 +248,7 @@ beta_hat
 
 #function to check proportion of sand
 prop_sand <- function(l) {
-  sum(l)/length(l)
+  sum(l==0)/length(l)
 }
 
 #function to find the sum of I(l_i=1) for i in the neighborhood of k
@@ -279,11 +279,6 @@ successprob <- function(neighbors, beta, d_k){
                dnorm(d_k, mean=mu_1, sd=sqrt(sigma_sq))* beta^(neighbors)))
 }
 
-#function to compute lambda_k (successprobability) for the bernoulli dist of l_i|d
-successprob2 <- function(neighbors, beta, d_k){
-  return ((1) /
-            (dnorm(d_k, mean=mu_0, sd=sqrt(sigma_sq))/ dnorm(d_k, mean=mu_1, sd=sqrt(sigma_sq)) * beta^(4-2*neighbors) + 1))
-}
 
 #proposals from the bernoulli distribution with probability of success = lambda_k
 g <- function(l, d, beta){
@@ -321,47 +316,21 @@ gibbsposterior <- function(l_0, d, beta, max_iter){
 }
 
 ##########################################################################################
-##                                Initial guess: All 0s                                 ##
+##                                Initial guess: All sand (all 0s)                      ##
 ##########################################################################################
 
 nsweeps <- 500
 
 l_00 <- rep(0, length.out = length(seismic))
-
 result0 <- gibbsposterior(l_00, seismic, beta_hat, length(seismic)*nsweeps)
 
 proportion0 <- result0[[2]][,1]
 distribution0 <- result0[[1]]
 
-# plot(1:nsweeps, proportion, type="l")
-# mean_post <- apply(distribution[200:nsweeps,], MARGIN = 2, FUN = mean)
-# image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(mean_post, nrow=n_seis),
-#            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# var_post <-apply(distribution[200:nsweeps,], MARGIN = 2, FUN = var)
-# image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(var_post, nrow=n_seis),
-#            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# realizationindex <- sample(200:nsweeps, 3)
-# realization1 <- distribution[realizationindex[1],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization1, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# realization2 <- distribution[realizationindex[2],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization2, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-#
-# realization3 <- distribution[realizationindex[3],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization3, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-
 
 ##########################################################################################
-##                                Initial guess: All 1s                                 ##
+##                                Initial guess: All shale (all 1s)                     ##
 ##########################################################################################
-
-
-nsweeps <- 500
 
 l_01 <- rep(1, length.out = length(seismic))
 result1 <- gibbsposterior(l_01, seismic, beta_hat, length(seismic)*nsweeps)
@@ -370,35 +339,10 @@ proportion1 <- result1[[2]][,1]
 distribution1 <- result1[[1]]
 
 
-# plot(1:nsweeps, proportion, type="l")
-# mean_post <- apply(distribution[200:nsweeps,], MARGIN = 2, FUN = mean)
-# image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(mean_post, nrow=n_seis),
-#            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# var_post <-apply(distribution[200:nsweeps,], MARGIN = 2, FUN = var)
-# image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(var_post, nrow=n_seis),
-#            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# realizationindex <- sample(200:nsweeps, 3)
-# realization1 <- distribution[realizationindex[1],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization1, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# realization2 <- distribution[realizationindex[2],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization2, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# 
-# realization3 <- distribution[realizationindex[3],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization3, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-
 
 ##########################################################################################
 ##                                Initial guess: Uniform iid                            ##
 ##########################################################################################
-
-nsweeps <- 500
 
 l_0r <- sample(0:1, size = length(seismic), replace = TRUE) 
 resultr <- gibbsposterior(l_0r, seismic, beta_hat, length(seismic)*nsweeps)
@@ -406,51 +350,29 @@ resultr <- gibbsposterior(l_0r, seismic, beta_hat, length(seismic)*nsweeps)
 proportionr <- resultr[[2]][,1]
 distributionr <- resultr[[1]]
 
-# plot(1:nsweeps, proportion, type="l")
-# mean_post <- apply(distribution[200:nsweeps,], MARGIN = 2, FUN = mean)
-# image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(mean_post, nrow=n_seis),
-#            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# var_post <-apply(distribution[200:nsweeps,], MARGIN = 2, FUN = var)
-# image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(var_post, nrow=n_seis),
-#            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# realizationindex <- sample(200:nsweeps, 3)
-# realization1 <- distribution[realizationindex[1],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization1, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# realization2 <- distribution[realizationindex[2],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization2, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# 
-# 
-# realization3 <- distribution[realizationindex[3],]
-# image(x = 1:n_seis, y = 1:n_seis, z = matrix(realization3, nrow=n_seis),
-#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
 
 
 #####################################
 ##              PLOTTING           ##
 #####################################
 # Plot
-pdf(
-  file = paste0(fig_path, "convergenceposterior2.pdf"),
-  height = 3.592,
-  width = 4.992
-)
-plot(1:nsweeps, proportion0, type="l", col = "blue", ylim = c(0,1), ylab = "Proportion sand", xlab = "Sweep number")
+# pdf(
+#   file = paste0(fig_path, "convergenceposterior.pdf"),
+#   height = 4.592,
+#   width = 4.992
+# )
+plot(1:nsweeps, proportion0, type="l", col = "blue", ylim = c(0,1), ylab = "Sand proportion", xlab = "Sweep number")
 lines(proportion1, col = "red")
 lines(proportionr, col = "black")
-legend("topright", legend = c("All shale", "All sand", "Uniform iid"), col = c("blue", "red", "black"), lty=c(1,1,1))
-dev.off()
+legend("bottomright", legend = c("All sand", "All shale", "Uniform iid"), col = c("blue", "red", "black"), lty=c(1,1,1))
+# dev.off()
 
 
 ##########################################################################################
 ##                 Six realizations of posterior with uniform prior                     ##
 ##########################################################################################
 
-realizationid <- sample(350:nsweeps, 2)
+realizationid <- sample(250:nsweeps, 2)
 
 
 
@@ -489,35 +411,35 @@ sample6 <- distributionr[realizationid[2],]
 ##             Expectation and Variance of posterior with Markov prior                  ##
 ##########################################################################################
 
-samples_combined <- rbind(distribution0[400:nsweeps,], rbind(distribution1[250:nsweeps,], distributionr[200:nsweeps,]))
+samples_combined <- rbind(distribution0[250:nsweeps,], rbind(distribution1[150:nsweeps,], distributionr[50:nsweeps,]))
 
 mean_post <- apply(samples_combined, MARGIN = 2, FUN = mean)
 var_post <- apply(samples_combined, MARGIN = 2, FUN = var)
 
 # Plot
-pdf(
-  file = paste0(fig_path, "post_exp_markov_prior.pdf"),
-  height = 4,
-  width = 5.2
-)
-par(mar = c(2, 2, 0, 2) + 0.5)
-image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(mean_post, nrow=n_seis),
-           col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# contour(x = 1:n_seis, y = 1:n_seis, z = matrix(mean_post, nrow=n_seis),
-#         nlevels = 3, drawlabels = FALSE, add = TRUE)
-dev.off()
-
-pdf(
-  file = paste0(fig_path, "post_var_markov_prior.pdf"),
-  height = 4,
-  width = 5.2
-)
-par(mar = c(2, 2, 0, 2) + 0.5)
-image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(var_post, nrow=n_seis),
-           col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-# contour(x = 1:n_seis, y = 1:n_seis, z = matrix(var_post, nrow=n_seis),
-#         nlevels = 3, drawlabels = FALSE, add = TRUE)
-dev.off()
+# pdf(
+#   file = paste0(fig_path, "post_exp_markov_prior.pdf"),
+#   height = 4,
+#   width = 5.2
+# )
+# par(mar = c(2, 2, 0, 2) + 0.5)
+# image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(mean_post, nrow=n_seis),
+#            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+# # contour(x = 1:n_seis, y = 1:n_seis, z = matrix(mean_post, nrow=n_seis),
+# #         nlevels = 3, drawlabels = FALSE, add = TRUE)
+# dev.off()
+# 
+# pdf(
+#   file = paste0(fig_path, "post_var_markov_prior.pdf"),
+#   height = 4,
+#   width = 5.2
+# )
+# par(mar = c(2, 2, 0, 2) + 0.5)
+# image.plot(x = 1:n_seis, y = 1:n_seis, z = matrix(var_post, nrow=n_seis),
+#            col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+# # contour(x = 1:n_seis, y = 1:n_seis, z = matrix(var_post, nrow=n_seis),
+# #         nlevels = 3, drawlabels = FALSE, add = TRUE)
+# dev.off()
 
 ##########################################################################################
 ##                         MMAP of posterior with Markov prior                          ##
@@ -527,13 +449,13 @@ mu_critical2 <- 0.5
 mmap2 <- 1*(mean_post > mu_critical2)
 
 # Plot
-pdf(
-  file = paste0(fig_path, "mmap_markov_prior.pdf"),
-  height = 4,
-  width = 4.4
-)
-par(mar = c(2, 2, 0, 2) + 0.5)
-image(x = 1:n_seis, y = 1:n_seis, z = matrix(mmap2, nrow=n_seis),
-      col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
-dev.off()
+# pdf(
+#   file = paste0(fig_path, "mmap_markov_prior.pdf"),
+#   height = 4,
+#   width = 4.4
+# )
+# par(mar = c(2, 2, 0, 2) + 0.5)
+# image(x = 1:n_seis, y = 1:n_seis, z = matrix(mmap2, nrow=n_seis),
+#       col=bw, zlim = zlim, asp = 1, xlab = "", ylab = "")
+# dev.off()
 
