@@ -93,18 +93,22 @@ corr <- ggplot(data = df_cov, aes(x=tau, y=rho, color=as.factor(nu), linetype = 
   #scale_color_manual(name="Type", labels=c("1", "2", "3", "4", "5", "6", "7", "8"), values = c()) +
   xlab(TeX("Distance, $\\tau$")) +
   ylab(TeX("Correlation, $\\rho_r(\\tau)$")) +
+  labs(color = "Corr.function", linetype=TeX("$\\nu_r$")) +
   theme_bw()  
 corr
 
 #ggsave("correlation.png", plot=corr)
 
+sigma_sq.labs <- c("sigma_r^2=1", "sigma_r^2=5")
+names(sigma_sq.labs) <- c("1", "5")
+levels(df_vario$sigma_sq) <- c("1"=TeX("$\\sigma_r^2=1$"), "5"=TeX("$\\sigma_r^2=5$"))
+
 vario <- ggplot(data = df_vario, aes(x=tau, y=gamma, color=as.factor(nu), linetype = type)) +
   geom_line() +
-  facet_grid(. ~ sigma_sq) +
-  #scale_color_manual(name="Type", labels=c("1", "2", "3", "4", "5", "6", "7", "8"), values = c()) +
+  facet_grid(. ~ sigma_sq, labeller=labeller(sigma_sq=sigma_sq.labs)) +#labeller=label_parsed) +
   xlab(TeX("Distance, $\\tau$")) +
   ylab(TeX("Variogram, $\\gamma_r(\\tau)$")) +
-  #labs(title = TeX("Variogram, $\\gamma_r(\\tau)$")) +
+  labs(color = "Corr.function", linetype=TeX("$\\nu_r$")) +
   theme_bw()  
 vario
 
