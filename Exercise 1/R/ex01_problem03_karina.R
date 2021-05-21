@@ -128,17 +128,17 @@ plot(emp_variogram9, type="l", xlab=TeX("$\\tau$"), ylab=TeX("$\\gamma_r$"), yli
 lines(distance, sigma_r*(1-exp(-1*distance/xi_r)), lty=2)
 dev.off() #close pdf
 pdf(paste0(fig_path,"empiricalvariograms36.pdf"), width=4, height=3)
-par(mgp=c(2,1,0), mar=c(0.5,1,-0.5,-1)+3)
+par(mgp=c(2,1,0), mar=c(0.5,1,-0.5,-1)+2.5)
 plot(emp_variogram36, type="l", xlab=TeX("$\\tau$"), ylab=TeX("$\\gamma_r$"), ylim=c(0,ymax))
 lines(distance, sigma_r*(1-exp(-1*distance/xi_r)), lty=2)
 dev.off() #close pdf
 pdf(paste0(fig_path,"empiricalvariograms64.pdf"), width=4, height=3)
-par(mgp=c(2,1,0),mar=c(0.5,1,-0.5,-1)+3)
+par(mgp=c(2,1,0),mar=c(0.5,1,-0.5,-1)+2.5)
 plot(emp_variogram64, type="l", xlab=TeX("$\\tau$"), ylab=TeX("$\\gamma_r$"), ylim=c(0,ymax))
 lines(distance, sigma_r*(1-exp(-1*distance/xi_r)), lty=2)
 dev.off() #close pdf
 pdf(paste0(fig_path,"empiricalvariograms100.pdf"), width=4, height=3)
-par(mgp=c(2,1,0), mar=c(0.5,1,-0.5,-1)+3)
+par(mgp=c(2,1,0), mar=c(0.5,1,-0.5,-1)+2.5)
 plot(emp_variogram100, type="l", xlab=TeX("$\\tau$"), ylab=TeX("$\\gamma_r$"), ylim=c(0,ymax))
 lines(distance, sigma_r*(1-exp(-1*distance/xi_r)), lty=2)
 dev.off() #close pdf
