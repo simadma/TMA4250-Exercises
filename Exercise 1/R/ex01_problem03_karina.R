@@ -57,7 +57,7 @@ contour(field3, xlab="x", ylab="y") #, plot.title = {par(cex.main=1);title(main 
 par(op) #end subplotting
 dev.off() #close pdf
 
-
+image.plot(field1, col = terrain.colors(nbcol), asp = 1)
 #plots for variograms
 pdf(paste0(fig_path,"empiricalvariograms3.pdf"), width = 6, height=2) #open pdf
 op <- par(mfrow=c(1,3)) #initiate subplotting

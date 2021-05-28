@@ -119,7 +119,7 @@ vario
 
 
 #b)
-#prior model is N_50(mu, sigma)?
+#prior model is N_50(mu, sigma)
 
 #function to convert the vector of covariances to the variance-covariance matrix
 converttosigma <- function(cov, sigma2){
@@ -147,38 +147,20 @@ getsimulations <- function(nofsims, grid, mu_r, cov, sigma2){
 }
 
 #function to plot the simulations
-plotsimulations <- function(nofsims, simulations, grid, fn, save=FALSE){
-  df <- data.frame(simulations) #data frame for plotting
-  
-  p1 <- ggplot(data=df, aes(x=grid, y=X1)) +
-    geom_point() +
-    xlab("x") +
+plotsimulations <- function(yscale, simulations, fn, save=FALSE){
+  simulationdf <- data.frame(L=L,x1 = simulations[,1], x2 = simulations[,2], x3 = simulations[,3], x4 = simulations[,4])
+  p1 <- ggplot(data=simulationdf, aes(x=L)) +
+    geom_line(aes(y=x1, col="1")) +
+    geom_line(aes(y=x2, col="2")) + 
+    geom_line(aes(y=x3, col="3")) +
+    geom_line(aes(y=x4, col="4")) +
+    ylim(yscale) +
+    xlab("x")+
     ylab("r(x)") +
-    theme_bw()
-  p2 <- ggplot(data=df, aes(x=grid, y=X2)) +
-    geom_point() +
-    xlab("x") +
-    ylab("r(x)") +
-    theme_bw()
-  
-  p3 <- ggplot(data=df, aes(x=grid, y=X3)) +
-    geom_point() +
-    xlab("x") +
-    ylab("r(x)") +
-    theme_bw()
-  p4 <- ggplot(data=df, aes(x=grid, y=X4)) +
-    geom_point() +
-    xlab("x") +
-    ylab("r(x)") +
-    theme_bw()
-  
-  
-  title="Realisations"
-  #title = paste(c("Realisations for sigma=",toString(sigma2),", method=",method))
-  #plot <-grid.arrange(p1,p2,p3,p4, nrow=2, top = title)
+    theme_bw()+
+    theme(legend.position = "none")
   if (save==TRUE){
-    g <- arrangeGrob(p1, p2, p3, p4, nrow=2, top = title) #generates g
-    ggsave(file=fn, g) #saves g
+    ggsave(filename=fn, p1, path="./Exercise 1/Figures/")
   }
 }
 
@@ -186,51 +168,62 @@ plotsimulations <- function(nofsims, simulations, grid, fn, save=FALSE){
 #1: powered exponential, sigma=1, nu=1
 set.seed(1)
 simulation1 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov1, sigma2=sigma2_r[1])
-plotsimulations(nofsims=4,simulations=simulation1, grid=L, fn = "1b1p.pdf")#, save= TRUE)
 
 
 #2: powered exponential, sigma=5, nu=1
 set.seed(2)
 simulation2 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov2, sigma2=sigma2_r[2])
-plotsimulations(nofsims=4,simulations=simulation2, grid=L, fn = "1b2p.pdf")#, save= TRUE)
 
 
 
 #3: powered exponential, sigma=1, nu=1.9
 set.seed(3)
 simulation3 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov3, sigma2=sigma2_r[1])
-plotsimulations(nofsims=4,simulations=simulation3, grid=L, fn = "1b3p.pdf")#, save= TRUE)
 
 
 
 #4: powered exponential, sigma=5, nu=1.9
 set.seed(4)
 simulation4 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov4, sigma2=sigma2_r[2])
-plotsimulations(nofsims=4,simulations=simulation4, grid=L, fn = "1b4p.pdf")#, save= TRUE)
+
+#plotting:
+yscale <- c(min(simulation1, simulation2, simulation3, simulation4),max(simulation1, simulation2, simulation3, simulation4))
+
+plotsimulations(yscale, simulation1, "1b1p.pdf", save=TRUE)
+plotsimulations(yscale, simulation2, "1b2p.pdf", save=TRUE)
+plotsimulations(yscale, simulation3, "1b3p.pdf", save=TRUE)
+plotsimulations(yscale, simulation4, "1b4p.pdf", save=TRUE)
+#plotsimulations(nofsims=4,simulations=simulation1, grid=L, fn = "1b1p.pdf")#, save= TRUE)
+#plotsimulations(nofsims=4,simulations=simulation2, grid=L, fn = "1b2p.pdf")#, save= TRUE)
+#plotsimulations(nofsims=4,simulations=simulation3, grid=L, fn = "1b3p.pdf")#, save= TRUE)
+#plotsimulations(nofsims=4,simulations=simulation4, grid=L, fn = "1b4p.pdf")#, save= TRUE)
 
 
 #5: Matern, sigma=1, nu=1
 set.seed(5)
 simulation5 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov5, sigma2=sigma2_r[1])
-plotsimulations(nofsims=4,simulations=simulation5, grid=L, fn = "1b5m.pdf")#, save= TRUE)
+
 
 #6: Matern, sigma=5, nu=1
 set.seed(6)
 simulation6<-getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov6, sigma2=sigma2_r[2])
-plotsimulations(nofsims=4,simulations=simulation6, grid=L, fn = "1b6m.pdf")#, save= TRUE)
 
 
 #7: Matern, sigma=1, nu=3
 set.seed(7)
 simulation7 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov7, sigma2=sigma2_r[1])
-plotsimulations(nofsims=4,simulations=simulation7, grid=L, fn = "1b7m.pdf")#, save= TRUE)
 
 
 #8: Matern, sigma=5, nu=3
 set.seed(8)
 simulation8 <- getsimulations(nofsims=4, grid=L, mu_r=mu_r, cov=cov8, sigma2=sigma2_r[2])
-plotsimulations(nofsims=4,simulations=simulation8, grid=L, fn = "1b8m.pdf")#, save= TRUE)
 
+yscale2 <- c(min(simulation5, simulation6, simulation7, simulation8),max(simulation5, simulation6, simulation7, simulation8))
+
+plotsimulations(yscale2, simulation5, "1b5m.pdf", save=TRUE)
+plotsimulations(yscale2, simulation6, "1b6m.pdf", save=TRUE)
+plotsimulations(yscale2, simulation7, "1b7m.pdf", save=TRUE)
+plotsimulations(yscale2, simulation8, "1b8m.pdf", save=TRUE)
 
 #1d 
 #Useful quantities
