@@ -7,6 +7,9 @@ library(gridExtra)
 library(latex2exp)
 library(tidyverse)
 library(reshape2)
+
+fig_path <- "./Exercise 1/Figures/"
+
 #problem 1
 
 #L=[1,50]
@@ -99,20 +102,23 @@ corr
 
 #ggsave("correlation.png", plot=corr)
 
-sigma_sq.labs <- c("sigma_r^2=1", "sigma_r^2=5")
-names(sigma_sq.labs) <- c("1", "5")
-levels(df_vario$sigma_sq) <- c("1"=TeX("$\\sigma_r^2=1$"), "5"=TeX("$\\sigma_r^2=5$"))
-
+df_vario$sigma_sq <- as.factor(df_vario$sigma_sq)
+levels(df_vario$sigma_sq) <- c(TeX("$\\sigma_r^2 = 1$"), TeX("$\\sigma_r^2 = 5$"))
 vario <- ggplot(data = df_vario, aes(x=tau, y=gamma, color=as.factor(nu), linetype = type)) +
   geom_line() +
-  facet_grid(. ~ sigma_sq, labeller=labeller(sigma_sq=sigma_sq.labs)) +#labeller=label_parsed) +
+  facet_grid(. ~ sigma_sq, labeller=label_parsed) +
   xlab(TeX("Distance, $\\tau$")) +
   ylab(TeX("Variogram, $\\gamma_r(\\tau)$")) +
   labs(color = "Corr.function", linetype=TeX("$\\nu_r$")) +
   theme_bw()  
 vario
 
-#ggsave("variogram.png", plot=vario)
+# ggsave(paste0(fig_path, "variogram.pdf"),
+#   plot = vario,
+#   width = 4,
+#   height = 4,
+#   units = "in"
+# )
 
 
 
